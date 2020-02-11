@@ -1,7 +1,8 @@
 #include<iostream>
 #include<stdio.h>
 #include<stdlib.h>
-#include <stdint.h>
+#include<stdint.h>
+#include <time.h>
 
 using namespace std;
 
@@ -58,6 +59,8 @@ int main() {
     //Instaniate KV Store
     kvStore Database;
 
+    double total_time = 0;
+
     for (int i=0; i<1000000; i++)
     {
         uint64_t key_size = random_key_size();
@@ -72,7 +75,16 @@ int main() {
 
         Slice value = { value_size, value_value };
 
+        struct timespec ts;
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+        long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
+      
         Database.put(key, value);
+      
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+        long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
+        
+        total_time += (en - st);
     }
 
     return 0;
