@@ -12,27 +12,28 @@ struct Slice {
 };
 
 class kvStore {
-    kvStore(uint64_t max_entries);
-    
-    bool get(Slice & key, Slice & value) {
-        return True
-    }
+    // kvStore(uint64_t max_entries);
+    public:
 
-    bool put(Slice & key, Slice & value) {
-        return True
-    }
+        bool get(Slice & key, Slice & value) {
+            return true;
+        }
 
-    bool del(Slice & key) {
-        return True
-    }
+        bool put(Slice & key, Slice & value) {
+            return true;
+        }
 
-    bool get(int N, Slice& key, Slice& value) {
-        return True
-    }
+        bool del(Slice & key) {
+            return true;
+        }
 
-    bool del(int N) {
-        return True
-    }
+        bool get(int N, Slice& key, Slice& value) {
+            return true;
+        }
+
+        bool del(int N) {
+            return true;
+        }
 };
 
 int random_key_size() {
@@ -41,7 +42,7 @@ int random_key_size() {
 
 void random_string(int key_size, char *value) {
     
-    value = malloc(key_size);
+    value = (char *)malloc(key_size);
 
     for(int i=0; i<key_size; i++) {     
         if (rand()%2 == 0)
@@ -86,6 +87,8 @@ int main() {
         
         total_time += (en - st);
     }
+
+    printf("Total time for put: %LF", total_time);
 
     return 0;
 }
