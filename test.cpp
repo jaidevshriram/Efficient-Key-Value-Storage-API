@@ -60,7 +60,7 @@ int main() {
     //Instaniate KV Store
     kvStore Database;
 
-    double total_time = 0;
+    long double total_time = 0;
 
     for (int i=0; i<1000000; i++)
     {
@@ -84,11 +84,11 @@ int main() {
       
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
         long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
-        
+
         total_time += (en - st);
     }
 
-    printf("Total time for put: %LF", total_time);
+    printf("Total time for put: %LF seconds\n", total_time);
 
     return 0;
 }
