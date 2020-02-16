@@ -16,6 +16,7 @@ class Trie {
     TrieNode *root = (TrieNode *)malloc(sizeof(TrieNode));
 
    public:
+
     Trie() {
         root->letter = '&';
         root->children = 0;
@@ -24,6 +25,7 @@ class Trie {
         }
         root->value.size = -1;
     }
+
     void insert(Slice &key, Slice &value) {
         int len = 0;
         TrieNode *curr = root;
@@ -32,8 +34,6 @@ class Trie {
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
-                // cout << x;
-                // cout << (curr->arr[x] == NULL);
                 if (curr->arr[x] == NULL) {
                     TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
                     new_node->letter = key.data[len];
@@ -45,9 +45,8 @@ class Trie {
                     curr->arr[x] = new_node;
                     // cout << &new_node << '\n';
                 }
+
                 curr = (TrieNode *)curr->arr[x];
-                // cout << curr->letter << '\n';
-                // return;
             } else if (len == key.size) {
                 // curr->value.data = value.data;
                 curr->value.size = value.size;

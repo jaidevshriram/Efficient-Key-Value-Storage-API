@@ -1,8 +1,18 @@
 #include <stdint.h>
+#include<bits/stdc++.h>
 
 struct Slice {
+
+public:
     uint8_t size;
     char* data;
+
+    Slice(string a)
+    {
+        size = a.length();
+        data = malloc(a.length());
+        memcpy(data, a.data(), a.length());
+    }
 };
 
 class kvStore {
