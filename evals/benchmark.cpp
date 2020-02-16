@@ -26,6 +26,7 @@ string random_value(int stringLength){
 
 	return value;
 }
+
 long CLOCKS_PER_SECOND = 1000000;
 kvstore kv;
 map<string,string> db;
@@ -100,6 +101,8 @@ int main()
 	for(int i=0;i<3000;i++)
 	{
 		int k = rand()%64 + 1;
+		if (k<=10)
+			k=1;
 		int v = rand()%256 + 1;
 		string key = random_key(k);
 		string value = random_value(v);
@@ -115,6 +118,8 @@ int main()
 	for(int i=0;i<1000;i++)
 	{
 		int x = rand()%5;
+
+		// GET Key
 		if(x==0)
 		{
 			string k = random_key(10);
@@ -126,12 +131,17 @@ int main()
                 incorrect = true;
             }
 		}
+
+		// PUT key
 		else if(x==1)
 		{
 			int k = rand()%64 + 1;
-			int v = rand()%256 + 1;
+			if (k==1)
+				k=1;
+			int v = rand()%256 + 2;
 			string key = random_key(k);
 			string value = random_value(v);
+			cout << "PUT " << key << endl;  
 			db.insert(pair<string,string>(key,value));
 			bool check1 = kv.get(key);
 			bool ans = kv.put(key,value);
@@ -142,13 +152,23 @@ int main()
                 incorrect = true;
             }
 		}
+		// DELETE
 		else if(x==2)
 		{
 			int max_size = db.size();
 			int rem = rand()%max_size;
 			map<string,string>:: iterator itr = db.begin();
 			for(int i=0;i<rem;i++)itr++;
+			// cout << itr->first << " " << itr->second << endl;
 			string key = itr->first;
+			bool ans = kv.get(key);
+            cout << "GET " << key << endl;	
+			map<string,string>:: iterator itr2 = db.begin();		
+			if((ans==false && itr2 != db.end()) || (ans==true && itr2 == db.end()) ) {
+                cout << "GET KEY: INCORRECT\n";
+                incorrect = true;
+            }
+
             cout << "DELETE " << key << endl;
 			bool check = kv.del(key);
 			db_size--;
@@ -159,6 +179,7 @@ int main()
                 incorrect = true;
             }
 		}
+		// Get nth Key
 		else if(x==3)
 		{
             i--;
@@ -175,6 +196,7 @@ int main()
 		{
             i--;
             continue;
+
 			int max_size = db.size();
 			int rem = rand()%max_size;
 			map<string,string>:: iterator itr = db.begin();
@@ -187,14 +209,14 @@ int main()
 			if(check2 == true)
 				incorrect = true;
 		}
+
+		if(incorrect == true)
+		{
+			cout << "NOT cool!\n";
+			return 0;
+		}
 	}
-	if(incorrect == true)
-	{
-        cout << "NOT cool!\n";
-		return 0;
-    } else {
-        cout << "Cool!\n";
-    }
+
 	int threads = 4;
 
     /*

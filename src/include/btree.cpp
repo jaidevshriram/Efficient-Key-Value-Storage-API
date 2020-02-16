@@ -308,7 +308,7 @@ void BTreeNode::remove(string k)
     // The key to be removed is present in this node
     if (idx < n && keys[idx].key == k)
     {
-        cout << keys[idx].key << " HAS BEEN FOUND HALLELUJAH " << " and is a "<< leaf << endl;
+
         // If the node is a leaf node - removeFromLeaf is called
         // Otherwise, removeFromNonLeaf function is called
         if (leaf)
@@ -600,7 +600,7 @@ void BTree::remove(string k)
 }
 
 // Driver program to test above functions
-/*
+
 int main() {
     BTree t(3); // A B-Tree with minium degree 3
 
@@ -662,8 +662,7 @@ int main() {
     t.traverse();
     cout << endl;
 
-    cout << t.search("6") << endl;
+    cout << t.search("16") << endl;
 
     return 0;
 }
-*/

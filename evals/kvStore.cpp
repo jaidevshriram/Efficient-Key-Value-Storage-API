@@ -11,12 +11,14 @@ class kvstore {
 
         bool get(string key) {
             BTreeNode * res = t.search(key);
-            if(!res)
+            if(res == NULL)
                 return false;
 
             for(int i = 0; i < res->n; i++) {
-                if(res->keys[i].key == key)
+                if(res->keys[i].key == key) {
+                    cout << res->keys[i].key;
                     return true;
+                }
             }
 
             return false;
@@ -32,7 +34,7 @@ class kvstore {
         bool del(string key) {
             bool exists = t.search(key) != 0;
             t.remove(key);
-
+            exists = t.search(key) != 0;
             return exists;
         }
 
