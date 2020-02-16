@@ -28,6 +28,7 @@ class Trie {
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
+            curr->children++;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
@@ -68,16 +69,8 @@ class Trie {
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
-                if (curr->arr[x] == NULL) {
-                    TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
-                    new_node->letter = '&';
-                    new_node->children = 0;
-                    for (int i = 0; i < 52; i++) {
-                        new_node->arr[i] = NULL;
-                    }
-                    new_node->value.size = -1;
-                    curr->arr[x] = new_node;
-                }
+                if (curr->arr[x] == NULL)
+                    return 0;
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
                 if (curr->value.size == -1)
@@ -91,6 +84,39 @@ class Trie {
             len++;
         }
         // cur.arr['a'] = &cur;
+    }
+
+    bool del(Slice &key) {
+        int len = 0;
+        TrieNode *curr = root;
+        while (curr != NULL) {
+            curr->children--;
+            if (len < key.size) {
+                int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
+                                             : key.data[len] - 65;
+                if (curr->arr[x] == NULL)
+                    return 0;
+                TrieNode *p = curr;
+                curr = (TrieNode *)curr->arr[x];
+                if (p->children == 0 && p != root)
+                    free(p);
+                else {
+                    if (curr->children == 1)
+                        p->arr[x] = NULL;
+                }
+            } else if (len == key.size) {
+                if (curr->value.size == -1)
+                    return 0;
+                else {
+                    if (curr->children == 0) {
+                        free(curr);
+                    } else
+                        curr->value.size = -1;
+                    return 1;
+                }
+            }
+            len++;
+        }
     }
 };
 
@@ -114,9 +140,11 @@ int main(void) {
     // b.data = {'h', 'e', 'l', 'l', 'o'};
     t.insert(a, b);
     b.data[4] = 'r';
-
+    // a.data[4] = 'r';
     cout << b.data << '\n';
     cout << t.get_val(a, b) << '\n';
     cout << b.data << '\n';
+    cout << t.del(a) << '\n';
+    cout << t.get_val(a, b) << '\n';
     return 0;
 }
