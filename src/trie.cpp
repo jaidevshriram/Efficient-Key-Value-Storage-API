@@ -1,19 +1,17 @@
 #include <iostream>
 #include <map>
+#include <bits/stdc++.h>
 using namespace std;
 
 struct Slice {
-
-public:
+   public:
     uint8_t size;
-    char* data;
+    char *data;
 
     Slice() {
-        
     }
 
-    Slice(string a)
-    {
+    Slice(string a) {
         size = a.length();
         data = (char *)malloc(a.length());
         memcpy(data, a.data(), a.length());
@@ -32,14 +30,29 @@ class Trie {
     TrieNode *root = (TrieNode *)malloc(sizeof(TrieNode));
 
    public:
-
     Trie() {
         root->letter = '&';
         root->children = 0;
         for (int i = 0; i < 52; i++) {
             root->arr[i] = NULL;
         }
-        root->value.size = -1;
+        root->value.size = UINT8_MAX;
+    }
+
+    void delete_recursive(void *node)
+    {
+        if(node == NULL)
+            return;
+
+        for (int i=0; i<52; i++)
+            if(node->arr[i] != NULL)
+                delete_recursive(node->arr[i]);
+
+        free(node);
+    }
+
+    ~Trie() {
+        delete_recursive(root);
     }
 
     void insert(Slice &key, Slice &value) {
@@ -57,11 +70,10 @@ class Trie {
                     for (int i = 0; i < 52; i++) {
                         new_node->arr[i] = NULL;
                     }
-                    new_node->value.size = -1;
+                    new_node->value.size = UINT8_MAX;
                     curr->arr[x] = new_node;
                     // cout << &new_node << '\n';
                 }
-
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
                 // curr->value.data = value.data;
@@ -77,6 +89,7 @@ class Trie {
         }
         // cur.arr['a'] = &cur;
     }
+
     bool get_val(Slice &key, Slice &value) {
         int len = 0;
         TrieNode *curr = root;
@@ -86,9 +99,13 @@ class Trie {
                                              : key.data[len] - 65;
                 if (curr->arr[x] == NULL)
                     return 0;
+                // cout << curr->letter << "-";
+
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
-                if (curr->value.size == -1)
+                cout << curr->letter << endl;
+                cout << curr->value.size << endl;
+                if (curr->value.size == UINT8_MAX)
                     return 0;
                 else {
                     value = curr->value;
@@ -99,6 +116,7 @@ class Trie {
             len++;
         }
         // cur.arr['a'] = &cur;
+        // cout << endl;
     }
 
     bool del(Slice &key) {
@@ -120,46 +138,39 @@ class Trie {
                         p->arr[x] = NULL;
                 }
             } else if (len == key.size) {
-                if (curr->value.size == -1)
+                if (curr->value.size == UINT8_MAX)
                     return 0;
                 else {
+                    // cout << curr->letter << " " << curr->children << endl;
                     if (curr->children == 0) {
                         free(curr);
-                    } else
-                        curr->value.size = -1;
+                    } else {
+                        curr->value.size = UINT8_MAX;
+                    }
                     return 1;
                 }
             }
             len++;
         }
+
+        return 1;
     }
 };
-/*
-int main(void) {
-    Trie t;
-    Slice a, b;
-    a.size = 5;
-    a.data = (char *)malloc(sizeof(char) * a.size);
-    a.data[0] = 'h';
-    a.data[1] = 'e';
-    a.data[2] = 'l';
-    a.data[3] = 'l';
-    a.data[4] = 'o';
-    b.size = 5;
-    b.data = (char *)malloc(sizeof(char) * b.size);
-    b.data[0] = 'h';
-    b.data[1] = 'h';
-    b.data[2] = 'e';
-    b.data[3] = 'h';
-    b.data[4] = 'h';
-    // b.data = {'h', 'e', 'l', 'l', 'o'};
-    t.insert(a, b);
-    b.data[4] = 'r';
-    // a.data[4] = 'r';
-    cout << b.data << '\n';
-    cout << t.get_val(a, b) << '\n';
-    cout << b.data << '\n';
-    cout << t.del(a) << '\n';
-    cout << t.get_val(a, b) << '\n';
-    return 0;
-}*/
+
+// int main(void) {
+//     Trie t;
+//     Slice a("n");
+//     Slice b("na");
+//     // Slice c("nb");
+//     Slice val("ragsga");
+
+//     t.insert(a, val);
+//     t.insert(b, val);
+//     // t.insert(c, val);
+
+//     cout << t.del(a) << endl;
+//     cout << t.get_val(a, val) << endl;
+//     // t.del(b);
+//     // cout<< t.get_val(b, val) <<endl;
+//     return 0;
+// }

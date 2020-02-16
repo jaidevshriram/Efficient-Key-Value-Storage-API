@@ -53,7 +53,7 @@ void *myThreadFun(void *vargp)
 			}
 			else if(x==1)
 			{
-				int k = rand()%64 + 1;
+				int k = rand()%64 + 2;
 				int v = rand()%256 + 1;
 				string key = random_key(k);
 				string value = random_value(v);
@@ -94,63 +94,101 @@ void *myThreadFun(void *vargp)
 	return NULL;  
 } 
 
+
 int main()
 {
-	for(int i=0;i<100000;i++)
+	srand(time(0));
+	// for(int i=0;i<100000;i++)
+	for(int i=0;i<10000;i++)
 	{
 		int k = rand()%64 + 1;
 		int v = rand()%256 + 1;
 		string key = random_key(k);
 		string value = random_value(v);
-		db.insert(pair<string,string>(key,value));
-		kv.put(key,value);
-		db_size++;
+		map<string,string>:: iterator itr = db.find(key);
+		if (itr == db.end()) {
+			db.insert(pair<string,string>(key,value));
+			cout << "PUT " << key << endl;
+			bool check1 = kv.get(key);
+			bool ans = kv.put(key,value);
+			bool check2 = kv.get(key);
+			db_size++;
+		}
 	}
 
 	bool incorrect = false;
 
-	for(int i=0;i<10000;i++)
+	// for(int i=0;i<10000;i++)
+	for(int i=0;i<1000;i++)
 	{
 		int x = rand()%5;
+
+		// GET Key
 		if(x==0)
 		{
 			string k = random_key(10);
 			bool ans = kv.get(k);
+            cout << "GET " << k << endl;
 			map<string,string>:: iterator itr = db.find(k);
-			if((ans==false && itr != db.end()) || (ans==true && itr == db.end()) )
-				incorrect = true;
+			if((ans==false && itr != db.end()) || (ans==true && itr == db.end()) ) {
+                cout << "GET KEY: INCORRECT\n";
+                incorrect = true;
+            }
 		}
+
+		// PUT key
 		else if(x==1)
 		{
 			int k = rand()%64 + 1;
 			int v = rand()%256 + 1;
 			string key = random_key(k);
 			string value = random_value(v);
-			db.insert(pair<string,string>(key,value));
-			bool check1 = kv.get(key);
-			bool ans = kv.put(key,value);
-			bool check2 = kv.get(key);
-			db_size++;
-			if(check2 == false || check1 != ans)
-				incorrect = true;
+			map<string,string>:: iterator itr = db.find(key);
+			if (itr == db.end()) {
+				db.insert(pair<string,string>(key,value));
+				cout << "PUT " << key << endl;
+				bool check1 = kv.get(key);
+				bool ans = kv.put(key,value);
+				bool check2 = kv.get(key);
+				db_size++;
+				if(check2 == false) {
+					cout << "WEIRD INCORRECT\n";
+					incorrect = true;
+				}
+			}
 		}
+		// DELETE
 		else if(x==2)
 		{
 			int max_size = db.size();
 			int rem = rand()%max_size;
 			map<string,string>:: iterator itr = db.begin();
 			for(int i=0;i<rem;i++)itr++;
+			// cout << itr->first << " " << itr->second << endl;
 			string key = itr->first;
+			bool ans = kv.get(key);
+            cout << "GET " << key << endl;	
+			map<string,string>:: iterator itr2 = db.begin();		
+			if((ans==false && itr2 != db.end()) || (ans==true && itr2 == db.end()) ) {
+                cout << "GET KEY: INCORRECT\n";
+                incorrect = true;
+            }
+
+            cout << "DELETE " << key << endl;
 			bool check = kv.del(key);
 			db_size--;
 			db.erase(itr);
 			bool check2 = kv.get(key);
-			if(check2 == true)
-				incorrect = true;
+			if(check2 == true) {
+                cout << "DELETE INCORRECT\n";
+                incorrect = true;
+            }
 		}
+		// Get nth Key
 		else if(x==3)
 		{
-			continue;
+            i--;
+            continue;
 			int max_size = db.size();
 			int rem = rand()%max_size;
 			pair <string,string> check = kv.get(rem);
@@ -161,7 +199,9 @@ int main()
 		}
 		else if(x==4)
 		{
-			continue;
+            i--;
+            continue;
+
 			int max_size = db.size();
 			int rem = rand()%max_size;
 			map<string,string>:: iterator itr = db.begin();
@@ -174,14 +214,17 @@ int main()
 			if(check2 == true)
 				incorrect = true;
 		}
-	}
-	if(incorrect == true)
-	{
-		cout<<0<<endl;
-		return 0;
-	}
-	// int threads = 4;
 
+		// if(incorrect == true)
+		// {
+		// 	cout << "NOT cool!\n";
+		// 	return 0;
+		// }
+	}
+
+	int threads = 4;
+
+    
 	// pthread_t tid[threads];
 	// for (int i = 0; i < threads; i++) 
 	// {
@@ -190,5 +233,6 @@ int main()
 	// }
 	// for(int i=0;i<threads;i++)
 	// 	pthread_join(tid[i],NULL);
+    
 	return 0;
 }
