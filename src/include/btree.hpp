@@ -1,4 +1,3 @@
-// C++ implemntation of search() and traverse() methods
 #include<iostream>
 using namespace std;
 
@@ -8,13 +7,12 @@ struct keyVal {
 
 // A BTree node
 class BTreeNode {
+    public:
     keyVal *keys; // An array of keys
     int t;	 // Minimum degree (defines the range for number of keys)
     BTreeNode **C; // An array of child pointers
     int n;	 // Current number of keys
     bool leaf; // Is true when node is leaf. Otherwise false
-
-    public:
 
     BTreeNode(int _t, bool _leaf); // Constructor
 
@@ -153,8 +151,9 @@ BTreeNode *BTreeNode::search(string k) {
         i++;
 
     // If the found key is equal to k, return this node
-    if (keys[i].key == k)
+    if (keys[i].key == k) {
         return this;
+    }
 
     // If key is not found here and this is a leaf node
     if (leaf == true)
@@ -323,7 +322,7 @@ void BTreeNode::remove(string k)
         // If this node is a leaf node, then the key is not present in tree
         if (leaf)
         {
-            cout << "The key "<< k <<" is does not exist in the tree\n";
+            cout << "can't remove\n";
             return;
         }
 
@@ -601,6 +600,7 @@ void BTree::remove(string k)
 }
 
 // Driver program to test above functions
+/*
 int main() {
     BTree t(3); // A B-Tree with minium degree 3
 
@@ -662,5 +662,8 @@ int main() {
     t.traverse();
     cout << endl;
 
+    cout << t.search("16") << endl;
+
     return 0;
 }
+*/
