@@ -78,8 +78,8 @@ class BTreeNode {
 class BTree {
     BTreeNode *root; // Pointer to root node
     int t; // Minimum degree
-    public:
 
+    public:
     // Constructor (Initializes tree as empty)
     BTree(int _t)
     {
