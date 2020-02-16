@@ -1,6 +1,5 @@
 #include<bits/stdc++.h>
 #include "../src/trie.cpp"
-#include "../src/include/kvStore.hpp"
 using namespace std;
 
 class kvstore{
@@ -15,7 +14,7 @@ public:
 
 	bool put(string key, string value){
 		Slice a(key), b(value);
-		db.insert(a, b));
+		db.insert(a, b);
 		return true;
 	}
 

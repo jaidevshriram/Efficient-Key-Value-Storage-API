@@ -1,8 +1,24 @@
 #include <iostream>
 #include <map>
-#include "./include/kvStore.hpp"
 using namespace std;
-// #include "bst.h"
+
+struct Slice {
+
+public:
+    uint8_t size;
+    char* data;
+
+    Slice() {
+        
+    }
+
+    Slice(string a)
+    {
+        size = a.length();
+        data = (char *)malloc(a.length());
+        memcpy(data, a.data(), a.length());
+    }
+};
 
 class Trie {
     struct TrieNode {
@@ -118,7 +134,7 @@ class Trie {
         }
     }
 };
-
+/*
 int main(void) {
     Trie t;
     Slice a, b;
@@ -146,4 +162,4 @@ int main(void) {
     cout << t.del(a) << '\n';
     cout << t.get_val(a, b) << '\n';
     return 0;
-}
+}*/
