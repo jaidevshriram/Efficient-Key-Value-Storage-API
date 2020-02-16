@@ -39,14 +39,14 @@ class Trie {
         root->value.size = UINT8_MAX;
     }
 
-    void delete_recursive(void *node)
+    void delete_recursive(TrieNode *node)
     {
         if(node == NULL)
             return;
 
         for (int i=0; i<52; i++)
             if(node->arr[i] != NULL)
-                delete_recursive(node->arr[i]);
+                delete_recursive((TrieNode *)node->arr[i]);
 
         free(node);
     }
@@ -103,8 +103,8 @@ class Trie {
 
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
-                cout << curr->letter << endl;
-                cout << curr->value.size << endl;
+                // cout << curr->letter << endl;
+                // cout << curr->value.size << endl;
                 if (curr->value.size == UINT8_MAX)
                     return 0;
                 else {

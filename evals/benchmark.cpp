@@ -99,7 +99,8 @@ int main()
 {
 	srand(time(0));
 	// for(int i=0;i<100000;i++)
-	for(int i=0;i<10000;i++)
+	long double total = 0;
+	for(int i=0;i<1000000;i++)
 	{
 		int k = rand()%64 + 1;
 		int v = rand()%256 + 1;
@@ -107,18 +108,27 @@ int main()
 		string value = random_value(v);
 		map<string,string>:: iterator itr = db.find(key);
 		if (itr == db.end()) {
+			struct timespec ts;
+			clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+			long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
 			db.insert(pair<string,string>(key,value));
+			clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+			long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
+			total += (en-st);
 			cout << "PUT " << key << endl;
 			bool check1 = kv.get(key);
 			bool ans = kv.put(key,value);
 			bool check2 = kv.get(key);
 			db_size++;
 		}
+		else
+			i--;
 	}
 
 	bool incorrect = false;
 
 	// for(int i=0;i<10000;i++)
+	/*
 	for(int i=0;i<1000;i++)
 	{
 		int x = rand()%5;
@@ -221,6 +231,9 @@ int main()
 		// 	return 0;
 		// }
 	}
+	*/
+
+	cout <<"TIme: "<< total<<endl;
 
 	int threads = 4;
 
