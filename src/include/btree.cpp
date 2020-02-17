@@ -221,6 +221,7 @@ void BTreeNode::insertNonFull(keyVal k) {
     int i = curr->n - 1;
 
     while (!curr->leaf) {
+        i = curr->n - 1;
         while (i >= 0 && curr->keys[i].key > k.key)
             i--;
 
@@ -233,6 +234,8 @@ void BTreeNode::insertNonFull(keyVal k) {
 
         curr = curr->C[i + 1];
     }
+
+    i = curr->n - 1;
 
     // The following loop does two things
     // a) Finds the location of new key to be inserted
@@ -566,6 +569,7 @@ void BTree::remove(string k) {
 }
 
 // Driver program to test above functions
+/*
 int main() {
     BTree t(3);  // A B-Tree with minium degree 3
 
@@ -651,6 +655,7 @@ int main() {
 
     return 0;
 }
+*/
 
 /*
 int main() {
