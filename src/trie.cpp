@@ -155,22 +155,98 @@ class Trie {
 
         return 1;
     }
+
+    bool get_val_N(int n, Slice &key, Slice &value) {
+        string s;
+        int len = 0;
+        TrieNode *curr = root;
+        while (curr != NULL) {
+            // cout << curr->children << endl;
+            if (curr->children < n) {
+                return 0;
+            }
+            if (curr->children == 1) {
+                while (curr->value == NULL) {
+                    for (int j = 0; j < 52; j++) {
+                        if (curr->arr[j] != NULL) {
+                            curr = (TrieNode *)curr->arr[j];
+                            s += (j >= 26) ? j + 97 - 26 : j + 65;
+                            break;
+                        }
+                    }
+                }
+                key = s;
+                value.size = curr->value->size;
+                value.data = (char *)malloc(sizeof(char) * value.size);
+                for (int i = 0; i < value.size; i++) {
+                    value.data[i] = curr->value->data[i];
+                }
+                return 1;
+            }
+            if (n == 1 && curr->value != NULL) {
+                key = s;
+                value.size = curr->value->size;
+                value.data = (char *)malloc(sizeof(char) * value.size);
+                for (int i = 0; i < value.size; i++) {
+                    value.data[i] = curr->value->data[i];
+                }
+                return 1;
+            }
+            if (curr->value != NULL)
+                n--;
+            for (int j = 0; j < 52; j++) {
+                if (curr->arr[j] != NULL) {
+                    TrieNode *p = (TrieNode *)curr->arr[j];
+                    if (p->children >= n) {
+                        s += (j >= 26) ? j + 97 - 26 : j + 65;
+                        curr = p;
+                        break;
+                    } else {
+                        n -= p->children;
+                    }
+                }
+            }
+        }
+        // cur.arr['a'] = &cur;
+        // cout << endl;
+    }
 };
 
-// int main(void) {
-//     Trie t;
-//     Slice a("n");
-//     Slice b("na");
-//     // Slice c("nb");
-//     Slice val("ragsga");
+int main(void) {
+    Trie t;
+    Slice a("n");
+    Slice b("na");
+    Slice c("nan");
+    Slice d("nna");
+    Slice e("nanna");
+    // Slice c("nb");
+    Slice val("ragsga");
 
-//     t.insert(a, val);
-//     t.insert(b, val);
-//     // t.insert(c, val);
+    t.insert(a, val);
+    t.insert(b, val);
+    t.insert(c, val);
+    t.insert(d, val);
+    t.insert(e, val);
+    // t.insert(c, val);
 
-//     cout << t.del(a) << endl;
-//     cout << t.get_val(a, val) << endl;
-//     // t.del(b);
-//     // cout<< t.get_val(b, val) <<endl;
-//     return 0;
-// }
+    // cout << t.del(a) << endl;
+    // cout << t.get_val(a, val) << endl;
+    // t.del(b);
+    // cout<< t.get_val(b, val) <<endl;
+    cout << t.get_val_N(1, a, val) << '\n';
+    cout << a.data << '\n';
+    cout << val.data << '\n';
+    cout << t.get_val_N(2, a, val) << '\n';
+    cout << a.data << '\n';
+    cout << val.data << '\n';
+    cout << t.get_val_N(3, a, val) << '\n';
+    cout << a.data << '\n';
+    cout << val.data << '\n';
+    cout << t.get_val_N(4, a, val) << '\n';
+    cout << a.data << '\n';
+    cout << val.data << '\n';
+    cout << t.get_val_N(5, a, val) << '\n';
+    cout << a.data << '\n';
+    cout << val.data << '\n';
+    return 0;
+}

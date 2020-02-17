@@ -1,17 +1,15 @@
 #include <stdint.h>
-#include<string>
-#include<bits/stdc++.h>
+#include <string>
+#include <bits/stdc++.h>
 
 struct Slice {
-
-public:
+   public:
     uint8_t size;
     char* data;
 
-    Slice(string a)
-    {
+    Slice(std::string a) {
         size = a.length();
-        data = malloc(a.length());
+        data = (char*)malloc(a.length());
         memcpy(data, a.data(), a.length());
     }
 };
