@@ -5,6 +5,8 @@ struct keyVal {
     string key, value;
 };
 
+struct searchStruct;
+
 // A BTree node
 class BTreeNode {
     public:
@@ -20,7 +22,7 @@ class BTreeNode {
     void traverse();
 
     // A function to search a key in subtree rooted with this node.
-    BTreeNode *search(string k); // returns NULL if k is not present.
+    searchStruct * search(string k); // returns NULL if k is not present.
 
     // A function that returns the index of the first key that is greater
     // or equal to k
@@ -77,6 +79,19 @@ class BTreeNode {
     friend class BTree;
 };
 
+struct searchStruct {
+    searchStruct(BTreeNode * p, int i, bool exists) {
+        this->b = p;
+        this->exists = exists;
+        this->i = i;
+    }
+
+    BTreeNode * b;
+    int i;
+    bool exists;
+};
+
+
 class BTree {
     BTreeNode *root; // Pointer to root node
     int t; // Minimum degree
@@ -95,7 +110,7 @@ class BTree {
     }
 
     // function to search a key in this tree
-    BTreeNode* search(string k)
+    searchStruct * search(string k)
     {
         return (root == NULL) ? NULL : root->search(k);
     }
@@ -144,7 +159,7 @@ void BTreeNode::traverse() {
 
 
 // Function to search key k in subtree rooted with this node
-BTreeNode *BTreeNode::search(string k) {
+searchStruct * BTreeNode::search(string k) {
     // Find the first key greater than or equal to k
     int i = 0;
     while (i < n && k > keys[i].key)
@@ -152,7 +167,7 @@ BTreeNode *BTreeNode::search(string k) {
 
     // If the found key is equal to k, return this node
     if (keys[i].key == k) {
-        return this;
+        return new searchStruct(this, i, true);
     }
 
     // If key is not found here and this is a leaf node
@@ -175,6 +190,12 @@ void BTree::insert(keyVal k) {
     }
     else // If tree is not empty
     {
+        // check if key already exists in the tree
+        searchStruct * srch = search(k.key);
+        if(srch->exists) {
+            srch->b->keys[srch->i] = k;
+            return;
+        }
         // If root is full, then tree grows in height
         if (root->n == 2*t-1)
         {
@@ -308,7 +329,7 @@ void BTreeNode::remove(string k)
     // The key to be removed is present in this node
     if (idx < n && keys[idx].key == k)
     {
-        cout << keys[idx].key << " HAS BEEN FOUND HALLELUJAH " << " and is a "<< leaf << endl;
+
         // If the node is a leaf node - removeFromLeaf is called
         // Otherwise, removeFromNonLeaf function is called
         if (leaf)
@@ -662,8 +683,32 @@ int main() {
     t.traverse();
     cout << endl;
 
-    cout << t.search("6") << endl;
-
     return 0;
+}
+*/
+
+/*
+int main() {
+    BTree t(3);
+
+    t.insert((keyVal){ "1", "1" });
+    t.traverse();
+    cout << endl;
+
+    t.insert((keyVal){ "1", "1a" });
+    t.traverse();
+    cout << endl;
+
+    t.insert((keyVal){ "1", "1ab" });
+    t.traverse();
+    cout << endl;
+
+    t.insert((keyVal){ "1", "1abc" });
+    t.traverse();
+    cout << endl;
+
+    t.insert((keyVal){ "1", "1abcd" });
+    t.traverse();
+    cout << endl;
 }
 */
