@@ -227,45 +227,34 @@ void BTree::insert(keyVal k) {
 // The assumption is, the node must be non-full when this
 // function is called
 void BTreeNode::insertNonFull(keyVal k) {
-    // Initialize index as index of rightmost element
-    int i = n-1;
+    BTreeNode * curr = this;
+    int i = curr->n-1;
 
-    // If this is a leaf node
-    if (leaf == true)
-    {
-        // The following loop does two things
-        // a) Finds the location of new key to be inserted
-        // b) Moves all greater keys to one place ahead
-        while (i >= 0 && keys[i].key > k.key)
-        {
-            keys[i+1] = keys[i];
-            i--;
-        }
-
-        // Insert the new key at found location
-        keys[i+1] = k;
-        n = n+1;
-    }
-    else // If this node is not leaf
-    {
-        // Find the child which is going to have the new key
-        while (i >= 0 && keys[i].key > k.key)
+    while(!curr->leaf) {
+        while(i >= 0 && curr->keys[i].key > k.key)
             i--;
 
-        // See if the found child is full
-        if (C[i+1]->n == 2*t-1)
-        {
-            // If the child is full, then split it
-            splitChild(i+1, C[i+1]);
+        if(curr->C[i + 1]->n == 2 * curr->t - 1) {
+            curr->splitChild(i+1, curr->C[i+1]);
 
-            // After split, the middle key of C[i] goes up and
-            // C[i] is splitted into two. See which of the two
-            // is going to have the new key
-            if (keys[i+1].key < k.key)
+            if(curr->keys[i+1].key < k.key)
                 i++;
         }
-        C[i+1]->insertNonFull(k);
+
+        curr = curr->C[i+1];
     }
+
+    // The following loop does two things
+    // a) Finds the location of new key to be inserted
+    // b) Moves all greater keys to one place ahead
+    while (i >= 0 && curr->keys[i].key > k.key) {
+        curr->keys[i+1] = curr->keys[i];
+        i--;
+    }
+
+    // Insert the new key at found location
+    curr->keys[i+1] = k;
+    curr->n = curr->n+1;
 }
 
 // A utility function to split the child y of this node
