@@ -60,7 +60,7 @@ class Trie {
         delete_recursive(root);
     }
 
-    void insert(Slice &key, Slice &value, TrieNode* curr) {
+    void insert(Slice &key, Slice* &value, TrieNode* curr) {
         TrieNode *new_root = curr;
         int len = 0;
         while (curr != NULL) {
@@ -73,6 +73,12 @@ class Trie {
                     curr -> is_word = true;
                     for (int i=len; i<key.size; i++)
                         curr->word.push_back(key.data[i]);
+                    curr->value = (Slice *)malloc(sizeof(Slice));
+                    curr->value->size = value->size;
+                    curr->value->data = (char *)malloc(sizeof(char) * value->size);
+                    for (int j = 0; j < value->size; j++) {
+                        curr->value->data[j] = value->data[j];
+                    }
                     return;
                 }
                 else if(curr->arr[x] == NULL)
@@ -93,9 +99,10 @@ class Trie {
                 }
             } else if (len == key.size) {
                 // curr->value.data = value.data;
-                if(curr == NULL)
+                if(curr == NULL || value==NULL)
                 {
                     cout << "NULL: Unreachable state!"<<endl;
+
                 }
                 else {
                     cout << "Assigning value now!" <<endl;
@@ -103,13 +110,13 @@ class Trie {
                     // cout << value.size << " -------- " << value.data << endl;
                 }
 
-                // curr->value = (Slice *)malloc(sizeof(Slice));
-                // curr->value->size = value.size;
-                // curr->value->data = (char *)malloc(sizeof(char) * value.size);
-                // for (int j = 0; j < value.size; j++) {
-                //     curr->value->data[j] = value.data[j];
-                // }
-                // cout << curr->value.data << '\n';
+                curr->value = (Slice *)malloc(sizeof(Slice));
+                curr->value->size = value->size;
+                curr->value->data = (char *)malloc(sizeof(char) * value->size);
+                for (int j = 0; j < value->size; j++) {
+                    curr->value->data[j] = value->data[j];
+                }
+                cout << curr->value->data << '\n';
                 return;           
             }
             len++;
@@ -124,10 +131,16 @@ class Trie {
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                                 : key.data[len] - 65;
-                if(curr->arr[x] == NULL && curr!=root) {
+                if(curr->arr[x] == NULL && curr!=root && curr->value==NULL) {
                     curr -> is_word = true;
                     for (int i=len; i<key.size; i++)
                         curr->word.push_back(key.data[i]);
+                    curr->value = (Slice *)malloc(sizeof(Slice));
+                    curr->value->size = value.size;
+                    curr->value->data = (char *)malloc(sizeof(char) * value.size);
+                    for (int j = 0; j < value.size; j++) {
+                        curr->value->data[j] = value.data[j];
+                    }
                     return;
                 }
                 else if(curr->arr[x] == NULL)
@@ -152,7 +165,7 @@ class Trie {
                         Slice new_key(curr->word);
                         cout<< "Existing word is "<<curr->word<<endl;
                         cout<<"Inserting with root as "<<curr->letter<<endl;
-                        insert(new_key, *(curr->value), curr);
+                        insert(new_key, curr->value, curr);
                         curr->word = "ERROR";
                     }
                 }
