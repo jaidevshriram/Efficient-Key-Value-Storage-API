@@ -1,5 +1,9 @@
 #include<bits/stdc++.h>
+#ifdef REC
+#include "../src/include/btree-rec.hpp"
+#else
 #include "../src/include/btree.hpp"
+#endif
 
 using namespace std;
 
