@@ -115,7 +115,8 @@ int main()
 			clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
 			long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
 			total += (en-st);
-			cout << "PUT " << key << endl;
+			// cout << "PUT " << key << endl;
+            printf("%7d\r", i);
 			bool check1 = kv.get(key);
 			bool ans = kv.put(key,value);
 			bool check2 = kv.get(key);
