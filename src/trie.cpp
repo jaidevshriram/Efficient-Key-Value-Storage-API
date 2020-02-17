@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string.h>
 #include <map>
 #include <bits/stdc++.h>
 using namespace std;
@@ -29,6 +30,7 @@ class Trie {
 
         TrieNode() {
             is_word = false;
+            word = "e";
         }
     };
 
@@ -71,6 +73,7 @@ class Trie {
                 if(curr->arr[x] == NULL && curr!=new_root) {
                     cout << "Compression"<<endl;
                     curr -> is_word = true;
+                    // curr->word = "E";
                     for (int i=len; i<key.size; i++)
                         curr->word.push_back(key.data[i]);
                     curr->value = (Slice *)malloc(sizeof(Slice));
@@ -132,9 +135,13 @@ class Trie {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                                 : key.data[len] - 65;
                 if(curr->arr[x] == NULL && curr!=root && curr->value==NULL) {
-                    curr -> is_word = true;
+                    curr->is_word = true;
+                    curr->word = "E";
                     for (int i=len; i<key.size; i++)
+                    {
+                        // printf("Index: %d data %c\n", i, key.data[i]);
                         curr->word.push_back(key.data[i]);
+                    }
                     curr->value = (Slice *)malloc(sizeof(Slice));
                     curr->value->size = value.size;
                     curr->value->data = (char *)malloc(sizeof(char) * value.size);
@@ -191,11 +198,31 @@ class Trie {
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
-                if (curr->arr[x] == NULL)
-                    return 0;
 
                 if(curr->is_word)
+                {
+                    int temp_len = len;
+                    for(int i=0; i<curr->word.size(); i++)
+                    {
+                        if(temp_len > key.size)
+                            return 0;
+                        if(key.data[temp_len] != curr->word[i])
+                            return 0;
+                        else
+                            temp_len++;
+                    }
+
+                    value.size = curr->value->size;
+                    value.data = (char *)malloc(sizeof(char) * value.size);
+                    for (int j = 0; j < value.size; j++) {
+                        value.data[j] = curr->value->data[j];
+                    }
+
                     return 1;
+                }
+
+                if (curr->arr[x] == NULL)
+                    return 0;
 
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
@@ -216,7 +243,7 @@ class Trie {
         // cout << endl;
     }
 
-    bool del(Slice &key) {
+    int del(Slice &key) {
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
@@ -273,6 +300,7 @@ class Trie {
             for(int i=0; i<52; i++)
                 display((TrieNode *)root->arr[i], level + 1);
         }
+        printf("---*--*---\n");
     }
 
     void display()
@@ -281,6 +309,7 @@ class Trie {
     }
 };
 
+/*
 int main(void) {
     Trie t;
     Slice a("ab");
@@ -294,7 +323,7 @@ int main(void) {
     t.display();
     // cout << t.del(a) << endl;
     cout << t.get_val(a, val) << endl;
-    // t.del(b);
     cout<< t.get_val(b, val) <<endl;
+    cout<< t.get_val(c, val) <<endl;
     return 0;
-}
+}*/
