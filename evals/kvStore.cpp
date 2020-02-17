@@ -14,8 +14,8 @@ class kvstore {
 
     bool put(string key, string value) {
         Slice a(key), b(value);
-        db.insert(a, b);
-        return true;
+        return db.insert(a, b);
+        // return true;
     }
 
     bool del(string key) {

@@ -56,7 +56,7 @@ class Trie {
         delete_recursive(root);
     }
 
-    void insert(Slice &key, Slice &value) {
+    bool insert(Slice &key, Slice &value) {
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
@@ -106,6 +106,9 @@ class Trie {
                 }
                 curr = aa->t;
             } else if (len == key.size) {
+                bool rv = 1;
+                if (curr->value == NULL)
+                    rv = 0;
                 // curr->value.data = value.data;
                 curr->value = (Slice *)malloc(sizeof(Slice));
                 curr->value->size = value.size;
@@ -114,7 +117,7 @@ class Trie {
                     curr->value->data[j] = value.data[j];
                 }
                 // cout << curr->value.data << '\n';
-                return;
+                return rv;
             }
             len++;
         }
@@ -261,11 +264,10 @@ class Trie {
     //     del(a);
     // }
 };
-
 /*
 int main(void) {
     Trie t;
-    Slice a("n");
+    Slice a("CxEUCIQabPxnFxQUooSyYdMQsfsPWBVbY");
     Slice b("na");
     Slice c("nan");
     Slice d("nna");
@@ -274,6 +276,7 @@ int main(void) {
     Slice val("ragsga");
 
     t.insert(a, val);
+    cout << t.get_val(a, val) << endl;
     t.insert(b, val);
     // t.insert(c, val);
     cout << t.get_val(b, val) << endl;

@@ -42,14 +42,15 @@ void *myThreadFun(void *vargp) {
     int time = 10;
     clock_t tt = clock();
     while ((float(tt - start) / CLOCKS_PER_SECOND) <= time) {
-        for (int i = 0; i < 10000; i++) {
+        // for(int i=0;i<10000;i++)
+        for (int i = 0; i < 100; i++) {
             transactions += 1;
             int x = rand() % 5;
             if (x == 0) {
                 string k = random_key(10);
                 bool ans = kv.get(k);
             } else if (x == 1) {
-                int k = rand() % 64 + 2;
+                int k = rand() % 64 + 1;
                 int v = rand() % 256 + 1;
                 string key = random_key(k);
                 string value = random_value(v);
@@ -85,47 +86,64 @@ void *myThreadFun(void *vargp) {
 }
 
 int main() {
-    // srand(time(0));
-    // for(int i=0;i<100000;i++)
+    srand(time(0));
     long double total = 0;
-    for (int i = 0; i < 100; i++) {
+    int n = 100000;
+    for (int i = 0; i < n; i++) {
         int k = rand() % 64 + 1;
         int v = rand() % 256 + 1;
         string key = random_key(k);
         string value = random_value(v);
-        map<string, string>::iterator itr = db.find(key);
-        if (itr == db.end()) {
-            struct timespec ts;
-            db.insert(pair<string, string>(key, value));
-            // cout << "PUT " << key << endl;
-            bool check1 = kv.get(key);
-            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-            long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
-            bool ans = kv.put(key, value);
-            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-            long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
-            total += (en - st);
-            bool check2 = kv.get(key);
-            db_size++;
-        } else
-            i--;
+        struct timespec ts;
+        // bool check1 = kv.get(key);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+        long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
+        bool ans = kv.put(key, value);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+        long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
+        total += (en - st);
         printf("%7d\r", i);
     }
-    cout << "TIme: " << total;
-
+    cout << total << '\n';
+    struct timespec start, end;
+    double time = 0, t;
+    for (int i = 0; i < n; i++) {
+        int k = rand() % 64 + 1;
+        int v = rand() % 256 + 1;
+        string key = random_key(k);
+        string value = random_value(v);
+        struct timespec ts;
+        // bool check1 = kv.get(key);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+        long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
+        // bool check1 = kv.get(key);
+        bool ans = kv.put(key, value);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+        long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
+        time += (en - st);
+        printf("%7d\r", i);
+    }
+    printf("\n%lf\n", time);
+    return 0;
     bool incorrect = false;
 
-    // for(int i=0;i<10000;i++)
-    /*
-{
-    for (int i = 0; i < 100; i++) {
+    time = 0;
+
+    for (int i = 0; i < 10000; i++) {
         int x = rand() % 2;
+
+        // printf("%7d\r", i);
 
         // GET Key
         if (x == 0) {
             string k = random_key(10);
-            bool ans = kv.get(k);
             cout << "GET " << k << endl;
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+            bool ans = kv.get(k);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            t = (end.tv_sec - start.tv_sec) +
+                (end.tv_nsec - start.tv_nsec) / 1e9;
+            time += t;
             map<string, string>::iterator itr = db.find(k);
             if ((ans == false && itr != db.end()) ||
                 (ans == true && itr == db.end())) {
@@ -137,21 +155,25 @@ int main() {
         // PUT key
         else if (x == 1) {
             int k = rand() % 64 + 1;
-            int v = rand() % 256 + 1;
+            int v = rand() % 256 + 2;
             string key = random_key(k);
             string value = random_value(v);
-            map<string, string>::iterator itr = db.find(key);
-            if (itr == db.end()) {
-                db.insert(pair<string, string>(key, value));
-                cout << "PUT " << key << endl;
-                bool check1 = kv.get(key);
-                bool ans = kv.put(key, value);
-                bool check2 = kv.get(key);
-                db_size++;
-                if (check2 == false) {
-                    cout << "WEIRD INCORRECT\n";
-                    incorrect = true;
-                }
+            cout << "PUT " << key << endl;
+            db.insert(pair<string, string>(key, value));
+            bool check1 = kv.get(key);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+            bool ans = kv.put(key, value);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            t = (end.tv_sec - start.tv_sec) +
+                (end.tv_nsec - start.tv_nsec) / 1e9;
+            time += t;
+            bool check2 = kv.get(key);
+            db_size++;
+            if (check2 == false || check1 != ans) {
+                cout << check2 << '\n';
+                cout << check1 << " " << ans << '\n';
+                cout << "PUT INCORRECT\n";
+                incorrect = true;
             }
         }
         // DELETE
@@ -164,7 +186,7 @@ int main() {
             // cout << itr->first << " " << itr->second << endl;
             string key = itr->first;
             bool ans = kv.get(key);
-            cout << "GET " << key << endl;
+            // cout << "DEL_GET " << key << endl;
             map<string, string>::iterator itr2 = db.begin();
             if ((ans == false && itr2 != db.end()) ||
                 (ans == true && itr2 == db.end())) {
@@ -172,8 +194,13 @@ int main() {
                 incorrect = true;
             }
 
-            cout << "DELETE " << key << endl;
+            // cout << "DELETE " << key << endl;
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
             bool check = kv.del(key);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            t = (end.tv_sec - start.tv_sec) +
+                (end.tv_nsec - start.tv_nsec) / 1e9;
+            time += t;
             db_size--;
             db.erase(itr);
             bool check2 = kv.get(key);
@@ -184,8 +211,6 @@ int main() {
         }
         // Get nth Key
         else if (x == 3) {
-            i--;
-            continue;
             int max_size = db.size();
             int rem = rand() % max_size;
             pair<string, string> check = kv.get(rem);
@@ -195,9 +220,6 @@ int main() {
             if (check.first != itr->first || check.second != itr->second)
                 incorrect = true;
         } else if (x == 4) {
-            i--;
-            continue;
-
             int max_size = db.size();
             int rem = rand() % max_size;
             map<string, string>::iterator itr = db.begin();
@@ -211,29 +233,26 @@ int main() {
             if (check2 == true)
                 incorrect = true;
         }
+
+        if (incorrect == true) {
+            cout << "NOT cool!\n";
+            return 0;
+        }
     }
 
-    // printf("%7d\r", i);
-    if (incorrect == true) {
-        cout << "NOT cool!\n";
-        return 0;
-    }
-}
-*/
-    cout << "TIme: " << total;
-    // cout << "Cool " << total;
-    // cout<<"ended"
+    printf("\n%lf\n", time);
 
-    // int threads = 4;
+    /*
+        int threads = 4;
 
-    // pthread_t tid[threads];
-    // for (int i = 0; i < threads; i++)
-    // {
-    // 	tid[i] = i;
-    //     pthread_create(&tid[i], NULL, myThreadFun, (void *)&tid[i]);
-    // }
-    // for(int i=0;i<threads;i++)
-    // 	pthread_join(tid[i],NULL);
-
+        pthread_t tid[threads];
+        for (int i = 0; i < threads; i++)
+        {
+                tid[i] = i;
+        pthread_create(&tid[i], NULL, myThreadFun, (void *)&tid[i]);
+        }
+        for(int i=0;i<threads;i++)
+                pthread_join(tid[i],NULL);
+    */
     return 0;
 }
