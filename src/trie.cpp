@@ -233,76 +233,76 @@ class Trie {
     }
 };
 
-string random_key(int stringLength) {
-    string key = "";
-    string letters = "";
-    for (char i = 'a'; i <= 'z'; i++)
-        letters += i;
-    for (char i = 'A'; i <= 'Z'; i++)
-        letters += i;
-    for (int i = 0; i < stringLength; i++)
-        key = key + letters[rand() % 52];
+// string random_key(int stringLength) {
+//     string key = "";
+//     string letters = "";
+//     for (char i = 'a'; i <= 'z'; i++)
+//         letters += i;
+//     for (char i = 'A'; i <= 'Z'; i++)
+//         letters += i;
+//     for (int i = 0; i < stringLength; i++)
+//         key = key + letters[rand() % 52];
 
-    return key;
-}
+//     return key;
+// }
 
-string random_value(int stringLength) {
-    string value = "";
-    string letters = "";
-    for (int i = 0; i <= 255; i++)
-        letters += char(i);
+// string random_value(int stringLength) {
+//     string value = "";
+//     string letters = "";
+//     for (int i = 0; i <= 255; i++)
+//         letters += char(i);
 
-    for (int i = 0; i < stringLength; i++)
-        value = value + letters[rand() % 256];
+//     for (int i = 0; i < stringLength; i++)
+//         value = value + letters[rand() % 256];
 
-    return value;
-}
+//     return value;
+// }
 
-int main(void) {
-    Trie t;
-    srand(time(NULL));
-    // Slice a("n");
-    // Slice b("na");
-    // Slice c("nan");
-    // Slice d("nna");
-    // Slice e("nanna");
-    // // Slice c("nb");
-    // Slice val("ragsga");
+// int main(void) {
+//     Trie t;
+//     srand(time(NULL));
+//     // Slice a("n");
+//     // Slice b("na");
+//     // Slice c("nan");
+//     // Slice d("nna");
+//     // Slice e("nanna");
+//     // // Slice c("nb");
+//     // Slice val("ragsga");
 
-    // t.insert(a, val);
-    // t.insert(b, val);
-    // t.insert(c, val);
-    // t.insert(d, val);
-    // t.insert(e, val);
-    // // t.insert(c, val);
+//     // t.insert(a, val);
+//     // t.insert(b, val);
+//     // t.insert(c, val);
+//     // t.insert(d, val);
+//     // t.insert(e, val);
+//     // // t.insert(c, val);
 
-    // // cout << t.del(a) << endl;
-    // // cout << t.get_val(a, val) << endl;
-    // // t.del(b);
-    // // cout<< t.get_val(b, val) <<endl;
-    // cout << t.del_N(1) << '\n';
-    // cout << t.get_val_N(1, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
-    // cout << t.get_val_N(2, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
-    // cout << t.get_val_N(3, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
-    // cout << t.get_val_N(4, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
-    // cout << t.get_val_N(5, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
+//     // // cout << t.del(a) << endl;
+//     // // cout << t.get_val(a, val) << endl;
+//     // // t.del(b);
+//     // // cout<< t.get_val(b, val) <<endl;
+//     // cout << t.del_N(1) << '\n';
+//     // cout << t.get_val_N(1, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
+//     // cout << t.get_val_N(2, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
+//     // cout << t.get_val_N(3, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
+//     // cout << t.get_val_N(4, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
+//     // cout << t.get_val_N(5, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
 
-    for (int i = 0; i < 10000; i++) {
-        Slice s1 = random_key(rand() % 64 + 1);
-        Slice s2 = random_key(rand() % 256 + 1);
-        t.insert(s1, s2);
-    }
+//     for (int i = 0; i < 10000; i++) {
+//         Slice s1 = random_key(rand() % 64 + 1);
+//         Slice s2 = random_key(rand() % 256 + 1);
+//         t.insert(s1, s2);
+//     }
 
-    cout << t.count_ptr(t.root) << " " << t.root->children << '\n';
-    return 0;
-}
+//     cout << t.count_ptr(t.root) << " " << t.root->children << '\n';
+//     return 0;
+// }
