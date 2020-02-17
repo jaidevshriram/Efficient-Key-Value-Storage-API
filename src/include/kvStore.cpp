@@ -1,6 +1,9 @@
-#include <stdint.h>
-#include<string>
+#include<stdint.h>
+#include<string.h>
+#include <iostream>
 #include<bits/stdc++.h>
+
+using namespace std;
 
 struct Slice {
 
@@ -11,6 +14,7 @@ public:
     Slice(string a)
     {
         size = a.length();
+        printf("LEngth of %s is %d\n", a, size);
         data = malloc(a.length());
         memcpy(data, a.data(), a.length());
     }

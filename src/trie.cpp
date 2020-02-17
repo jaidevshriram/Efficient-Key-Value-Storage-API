@@ -26,6 +26,10 @@ class Trie {
         void *arr[52];
         Slice *value;
         int children;
+
+        TrieNode() {
+            is_word = false;
+        }
     };
 
     TrieNode *root = (TrieNode *)malloc(sizeof(TrieNode));
@@ -57,40 +61,54 @@ class Trie {
     }
 
     void insert(Slice &key, Slice &value, TrieNode* curr) {
+        TrieNode *new_root = curr;
         int len = 0;
         while (curr != NULL) {
             curr->children++;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                                 : key.data[len] - 65;
-                if(curr->arr[x] == NULL) {
+                if(curr->arr[x] == NULL && curr!=new_root) {
+                    cout << "Compression"<<endl;
                     curr -> is_word = true;
                     for (int i=len; i<key.size; i++)
                         curr->word.push_back(key.data[i]);
                     return;
                 }
-                else {
-                    TrieNode *prev = curr;
-                    curr = (TrieNode*)curr->arr[x];
-                    if (curr->is_word) {
-                        curr->is_word = false;
-                        x = (key.data[len+1] > 90) ? key.data[len+1] - 97 + 26
-                                                : key.data[len+1] - 65;
-                        int y = (curr->word[0] > 90 ) ? curr->word[0] - 97 + 25 : curr->word[0] - 65;
-                        curr->arr[x] = (TrieNode *)malloc(sizeof(TrieNode));
-                        curr->arr[y] = (TrieNode *)malloc(sizeof(TrieNode));
-                        Slice new_key(curr->word);
-                        insert(new_key, *(curr->value), prev);
+                else if(curr->arr[x] == NULL)
+                {
+                    TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
+                    new_node->letter = key.data[len];
+                    new_node->children = 0;
+                    new_node->is_word = false;
+                    for (int i = 0; i < 52; i++) {
+                        new_node->arr[i] = NULL;
                     }
+                    new_node->value = NULL;
+                    curr->arr[x] = new_node;
+                    curr = (TrieNode *)curr->arr[x];
+                }
+                else {
+                    cout << "Unreachable state!" <<endl;
                 }
             } else if (len == key.size) {
                 // curr->value.data = value.data;
-                curr->value = (Slice *)malloc(sizeof(Slice));
-                curr->value->size = value.size;
-                curr->value->data = (char *)malloc(sizeof(char) * value.size);
-                for (int j = 0; j < value.size; j++) {
-                    curr->value->data[j] = value.data[j];
+                if(curr == NULL)
+                {
+                    cout << "NULL: Unreachable state!"<<endl;
                 }
+                else {
+                    cout << "Assigning value now!" <<endl;
+                    cout << key.data << " - " << key.size << " - " << len << endl;
+                    // cout << value.size << " -------- " << value.data << endl;
+                }
+
+                // curr->value = (Slice *)malloc(sizeof(Slice));
+                // curr->value->size = value.size;
+                // curr->value->data = (char *)malloc(sizeof(char) * value.size);
+                // for (int j = 0; j < value.size; j++) {
+                //     curr->value->data[j] = value.data[j];
+                // }
                 // cout << curr->value.data << '\n';
                 return;           
             }
@@ -131,9 +149,11 @@ class Trie {
                         curr->is_word = false;
                         x = (key.data[len+1] > 90) ? key.data[len+1] - 97 + 26
                                                 : key.data[len+1] - 65;
-                        int y = (curr->word[0] > 90 ) ? curr->word[0] - 97 + 25 : curr->word[0] - 65;
                         Slice new_key(curr->word);
+                        cout<< "Existing word is "<<curr->word<<endl;
+                        cout<<"Inserting with root as "<<curr->letter<<endl;
                         insert(new_key, *(curr->value), curr);
+                        curr->word = "ERROR";
                     }
                 }
             } else if (len == key.size) {
