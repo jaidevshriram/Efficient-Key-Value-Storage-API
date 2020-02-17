@@ -109,8 +109,8 @@ int main()
 		map<string,string>:: iterator itr = db.find(key);
 		if (itr == db.end()) {
 			db.insert(pair<string,string>(key,value));
-			cout << "PUT " << key << endl;
-            // printf("%7d\r", i);
+			// cout << "PUT " << key << endl;
+            printf("\r%8d", i);
 			bool check1 = kv.get(key);
 			if(check1 == true)
 			{

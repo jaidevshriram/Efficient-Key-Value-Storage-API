@@ -20,7 +20,7 @@ struct Slice {
         
         if(size == 0)
         {
-            printf("\t\033[1;31mTHERE IS NO STRING WHAT EVEN IS HAPPENING\033[0m\n");
+            // printf("\t\033[1;31mTHERE IS NO STRING WHAT EVEN IS HAPPENING\033[0m\n");
             //exit(-1);
         }
 
