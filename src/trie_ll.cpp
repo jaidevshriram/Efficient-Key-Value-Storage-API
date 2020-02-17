@@ -22,20 +22,23 @@ class Trie {
     struct TrieNode {
         char letter;
         // map<char, void *> mp;
-        void *arr[52];
+        void *start;
         Slice *value;
         int children;
     };
 
+    struct LLNode {
+        int letter;
+        LLNode *next;
+        TrieNode *t;
+    };
     TrieNode *root = (TrieNode *)malloc(sizeof(TrieNode));
 
    public:
     Trie() {
         root->letter = '&';
         root->children = 0;
-        for (int i = 0; i < 52; i++) {
-            root->arr[i] = NULL;
-        }
+        root->start = NULL;
         root->value = NULL;
     }
 
@@ -43,9 +46,8 @@ class Trie {
         if (node == NULL)
             return;
 
-        for (int i = 0; i < 52; i++)
-            if (node->arr[i] != NULL)
-                delete_recursive((TrieNode *)node->arr[i]);
+        for (LLNode *b = (LLNode *)node->start; b != NULL; b = b->next)
+            delete_recursive((TrieNode *)b);
 
         free(node);
     }
@@ -62,6 +64,8 @@ class Trie {
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
+                for (LLNode *b = (LLNode *)node->start; b != NULL; b = b->next)
+                    delete_recursive((TrieNode *)b);
                 if (curr->arr[x] == NULL) {
                     TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
                     new_node->letter = key.data[len];
