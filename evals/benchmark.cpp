@@ -99,14 +99,12 @@ int main()
 {
     srand(time(0));
     struct timespec start, end;
-    double time = 0;
-    int n = 5000000;
+    double time = 0, t;
+    int n = 4000000;
 	// for(int i=0;i<100000;i++)
-	for(int i=0;i<5000000;i++)
+	for(int i=0;i<n;i++)
 	{
 		int k = rand()%64 + 1;
-		if (k<=10)
-			k=1;
 		int v = rand()%256 + 1;
 		string key = random_key(k);
 		string value = random_value(v);
@@ -115,26 +113,33 @@ int main()
         clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 		kv.put(key,value);
         clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-        double t = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+        t = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
         time += t;
-        // printf("%7d\r", i);
+        printf("%7d\r", i);
 		db_size++;
 	}
-    printf("%lf\n", time);
+    printf("\n%lf\n", time);
 
 	bool incorrect = false;
 
+    time = 0;
+
 	for(int i=0;i<10000;i++)
-	// for(int i=0;i<0;i++)
 	{
-		int x = rand()%5;
+		int x = rand()%3;
+
+        printf("%7d\r", i);
 
 		// GET Key
 		if(x==0)
 		{
 			string k = random_key(10);
-			bool ans = kv.get(k);
             // cout << "GET " << k << endl;
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+            bool ans = kv.get(k);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            t = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+            time += t;
 			map<string,string>:: iterator itr = db.find(k);
 			if((ans==false && itr != db.end()) || (ans==true && itr == db.end()) ) {
                 cout << "GET KEY: INCORRECT\n";
@@ -146,19 +151,21 @@ int main()
 		else if(x==1)
 		{
 			int k = rand()%64 + 1;
-			if (k==1)
-				k=1;
 			int v = rand()%256 + 2;
 			string key = random_key(k);
 			string value = random_value(v);
-			// cout << "PUT " << key << endl;  
+			// cout << "PUT " << key << endl;
 			db.insert(pair<string,string>(key,value));
 			bool check1 = kv.get(key);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 			bool ans = kv.put(key,value);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            t = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+            time += t;
 			bool check2 = kv.get(key);
 			db_size++;
 			if(check2 == false || check1 != ans) {
-                cout << "WEIRD INCORRECT\n";
+                cout << "PUT INCORRECT\n";
                 incorrect = true;
             }
 		}
@@ -172,7 +179,7 @@ int main()
 			// cout << itr->first << " " << itr->second << endl;
 			string key = itr->first;
 			bool ans = kv.get(key);
-            // cout << "GET " << key << endl;	
+            // cout << "DEL_GET " << key << endl;
 			map<string,string>:: iterator itr2 = db.begin();		
 			if((ans==false && itr2 != db.end()) || (ans==true && itr2 == db.end()) ) {
                 cout << "GET KEY: INCORRECT\n";
@@ -180,7 +187,11 @@ int main()
             }
 
             // cout << "DELETE " << key << endl;
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 			bool check = kv.del(key);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            t = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+            time += t;
 			db_size--;
 			db.erase(itr);
 			bool check2 = kv.get(key);
@@ -192,8 +203,6 @@ int main()
 		// Get nth Key
 		else if(x==3)
 		{
-            i--;
-            continue;
 			int max_size = db.size();
 			int rem = rand()%max_size;
 			pair <string,string> check = kv.get(rem);
@@ -204,9 +213,6 @@ int main()
 		}
 		else if(x==4)
 		{
-            i--;
-            continue;
-
 			int max_size = db.size();
 			int rem = rand()%max_size;
 			map<string,string>:: iterator itr = db.begin();
@@ -227,9 +233,11 @@ int main()
 		}
 	}
 
-	int threads = 4;
+    printf("\n%lf\n", time);
 
     /*
+	int threads = 4;
+
 	pthread_t tid[threads];
 	for (int i = 0; i < threads; i++) 
 	{
