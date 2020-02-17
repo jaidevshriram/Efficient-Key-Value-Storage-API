@@ -97,8 +97,12 @@ void *myThreadFun(void *vargp)
 
 int main()
 {
+    srand(time(0));
+    struct timespec start, end;
+    double time = 0;
+    int n = 5000000;
 	// for(int i=0;i<100000;i++)
-	for(int i=0;i<3000;i++)
+	for(int i=0;i<5000000;i++)
 	{
 		int k = rand()%64 + 1;
 		if (k<=10)
@@ -106,16 +110,22 @@ int main()
 		int v = rand()%256 + 1;
 		string key = random_key(k);
 		string value = random_value(v);
-        cout << "PUT " << key << endl;//<< " " << value << endl;
+        // cout << "PUT " << key << endl;//<< " " << value << endl;
 		db.insert(pair<string,string>(key,value));
+        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 		kv.put(key,value);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+        double t = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+        time += t;
+        // printf("%7d\r", i);
 		db_size++;
 	}
+    printf("%lf\n", time);
 
 	bool incorrect = false;
 
-	// for(int i=0;i<10000;i++)
-	for(int i=0;i<1000;i++)
+	for(int i=0;i<10000;i++)
+	// for(int i=0;i<0;i++)
 	{
 		int x = rand()%5;
 
@@ -124,7 +134,7 @@ int main()
 		{
 			string k = random_key(10);
 			bool ans = kv.get(k);
-            cout << "GET " << k << endl;
+            // cout << "GET " << k << endl;
 			map<string,string>:: iterator itr = db.find(k);
 			if((ans==false && itr != db.end()) || (ans==true && itr == db.end()) ) {
                 cout << "GET KEY: INCORRECT\n";
@@ -141,7 +151,7 @@ int main()
 			int v = rand()%256 + 2;
 			string key = random_key(k);
 			string value = random_value(v);
-			cout << "PUT " << key << endl;  
+			// cout << "PUT " << key << endl;  
 			db.insert(pair<string,string>(key,value));
 			bool check1 = kv.get(key);
 			bool ans = kv.put(key,value);
@@ -162,14 +172,14 @@ int main()
 			// cout << itr->first << " " << itr->second << endl;
 			string key = itr->first;
 			bool ans = kv.get(key);
-            cout << "GET " << key << endl;	
+            // cout << "GET " << key << endl;	
 			map<string,string>:: iterator itr2 = db.begin();		
 			if((ans==false && itr2 != db.end()) || (ans==true && itr2 == db.end()) ) {
                 cout << "GET KEY: INCORRECT\n";
                 incorrect = true;
             }
 
-            cout << "DELETE " << key << endl;
+            // cout << "DELETE " << key << endl;
 			bool check = kv.del(key);
 			db_size--;
 			db.erase(itr);

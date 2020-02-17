@@ -10,18 +10,8 @@ class kvstore {
         kvstore() : t(3) { }
 
         bool get(string key) {
-            BTreeNode * res = t.search(key);
-            if(res == NULL)
-                return false;
-
-            for(int i = 0; i < res->n; i++) {
-                if(res->keys[i].key == key) {
-                    cout << res->keys[i].key;
-                    return true;
-                }
-            }
-
-            return false;
+            searchStruct * res = t.search(key);
+            return res && res->exists;
         }
 
         bool put(string key, string value) {

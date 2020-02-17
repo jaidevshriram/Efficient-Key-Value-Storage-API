@@ -166,7 +166,7 @@ searchStruct * BTreeNode::search(string k) {
         i++;
 
     // If the found key is equal to k, return this node
-    if (keys[i].key == k) {
+    if (i < n && keys[i].key == k) {
         return new searchStruct(this, i, true);
     }
 
@@ -192,7 +192,7 @@ void BTree::insert(keyVal k) {
     {
         // check if key already exists in the tree
         searchStruct * srch = search(k.key);
-        if(srch->exists) {
+        if(srch && srch->exists) {
             srch->b->keys[srch->i] = k;
             return;
         }
@@ -691,23 +691,12 @@ int main() {
 int main() {
     BTree t(3);
 
-    t.insert((keyVal){ "1", "1" });
-    t.traverse();
-    cout << endl;
+    t.insert((keyVal) { "ksGdbNHUXTgCnMwcpCRbXgvmYHrSwoSGGylHOTdLok", "1" });
+    t.insert((keyVal) { "dqkBibGEnoFmbVOoFVxdsvLqKIRXg", "1" });
 
-    t.insert((keyVal){ "1", "1a" });
-    t.traverse();
-    cout << endl;
-
-    t.insert((keyVal){ "1", "1ab" });
-    t.traverse();
-    cout << endl;
-
-    t.insert((keyVal){ "1", "1abc" });
-    t.traverse();
-    cout << endl;
-
-    t.insert((keyVal){ "1", "1abcd" });
+    t.remove("ksGdbNHUXTgCnMwcpCRbXgvmYHrSwoSGGylHOTdLok");
+    searchStruct * s = t.search("ksGdbNHUXTgCnMwcpCRbXgvmYHrSwoSGGylHOTdLok");
+    cout << (s && s->exists) << endl;
     t.traverse();
     cout << endl;
 }
