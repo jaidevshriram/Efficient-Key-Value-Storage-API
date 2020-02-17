@@ -23,7 +23,7 @@ class Trie {
         char letter;
         // map<char, void *> mp;
         void *arr[52];
-        Slice value;
+        Slice *value;
         int children;
     };
 
@@ -36,16 +36,15 @@ class Trie {
         for (int i = 0; i < 52; i++) {
             root->arr[i] = NULL;
         }
-        root->value.size = UINT8_MAX;
+        root->value = NULL;
     }
 
-    void delete_recursive(TrieNode *node)
-    {
-        if(node == NULL)
+    void delete_recursive(TrieNode *node) {
+        if (node == NULL)
             return;
 
-        for (int i=0; i<52; i++)
-            if(node->arr[i] != NULL)
+        for (int i = 0; i < 52; i++)
+            if (node->arr[i] != NULL)
                 delete_recursive((TrieNode *)node->arr[i]);
 
         free(node);
@@ -70,17 +69,18 @@ class Trie {
                     for (int i = 0; i < 52; i++) {
                         new_node->arr[i] = NULL;
                     }
-                    new_node->value.size = UINT8_MAX;
+                    new_node->value = NULL;
                     curr->arr[x] = new_node;
                     // cout << &new_node << '\n';
                 }
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
                 // curr->value.data = value.data;
-                curr->value.size = value.size;
-                curr->value.data = (char *)malloc(sizeof(char) * value.size);
+                curr->value = (Slice *)malloc(sizeof(Slice));
+                curr->value->size = value.size;
+                curr->value->data = (char *)malloc(sizeof(char) * value.size);
                 for (int j = 0; j < value.size; j++) {
-                    curr->value.data[j] = value.data[j];
+                    curr->value->data[j] = value.data[j];
                 }
                 // cout << curr->value.data << '\n';
                 return;
@@ -99,17 +99,16 @@ class Trie {
                                              : key.data[len] - 65;
                 if (curr->arr[x] == NULL)
                     return 0;
-                // cout << curr->letter << "-";
-
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
-                // cout << curr->letter << endl;
-                // cout << curr->value.size << endl;
-                if (curr->value.size == UINT8_MAX)
+                if (curr->value == NULL)
                     return 0;
                 else {
-                    value = curr->value;
-                    // cout << curr->value.data << '\n';
+                    value.size = curr->value->size;
+                    value.data = (char *)malloc(sizeof(char) * value.size);
+                    for (int j = 0; j < value.size; j++) {
+                        value.data[j] = curr->value->data[j];
+                    }
                     return 1;
                 }
             }
@@ -138,14 +137,15 @@ class Trie {
                         p->arr[x] = NULL;
                 }
             } else if (len == key.size) {
-                if (curr->value.size == UINT8_MAX)
+                if (curr->value == NULL)
                     return 0;
                 else {
                     // cout << curr->letter << " " << curr->children << endl;
                     if (curr->children == 0) {
                         free(curr);
                     } else {
-                        curr->value.size = UINT8_MAX;
+                        free(curr->value);
+                        curr->value = NULL;
                     }
                     return 1;
                 }
