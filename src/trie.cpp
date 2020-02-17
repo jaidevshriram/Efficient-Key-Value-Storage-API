@@ -21,7 +21,8 @@ struct Slice {
 class Trie {
     struct TrieNode {
         char letter;
-        // map<char, void *> mp;
+        bool is_word;
+        string word;
         void *arr[52];
         Slice *value;
         int children;
@@ -33,6 +34,7 @@ class Trie {
     Trie() {
         root->letter = '&';
         root->children = 0;
+        root->is_word = false;
         for (int i = 0; i < 52; i++) {
             root->arr[i] = NULL;
         }
@@ -61,33 +63,20 @@ class Trie {
             curr->children++;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
-                                             : key.data[len] - 65;
-                if (curr->arr[x] == NULL) {
-                    TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
-                    new_node->letter = key.data[len];
-                    new_node->children = 0;
-                    for (int i = 0; i < 52; i++) {
-                        new_node->arr[i] = NULL;
-                    }
-                    new_node->value = NULL;
-                    curr->arr[x] = new_node;
-                    // cout << &new_node << '\n';
+                                                : key.data[len] - 65;
+                if(curr->arr[x] == NULL) {
+                    curr -> is_word = true;
+                    for (int i=len; i<key.size; k++)
+                        curr->word.append(key.data[i]);
                 }
-                curr = (TrieNode *)curr->arr[x];
+                else {
+                    
+                }
             } else if (len == key.size) {
-                // curr->value.data = value.data;
-                curr->value = (Slice *)malloc(sizeof(Slice));
-                curr->value->size = value.size;
-                curr->value->data = (char *)malloc(sizeof(char) * value.size);
-                for (int j = 0; j < value.size; j++) {
-                    curr->value->data[j] = value.data[j];
-                }
-                // cout << curr->value.data << '\n';
-                return;
+
             }
             len++;
         }
-        // cur.arr['a'] = &cur;
     }
 
     bool get_val(Slice &key, Slice &value) {
