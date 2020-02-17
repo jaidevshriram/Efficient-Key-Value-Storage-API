@@ -30,7 +30,6 @@ class Trie {
 
         TrieNode() {
             is_word = false;
-            word = "e";
         }
     };
 
@@ -73,7 +72,6 @@ class Trie {
                 if(curr->arr[x] == NULL && curr!=new_root) {
                     cout << "Compression"<<endl;
                     curr -> is_word = true;
-                    // curr->word = "E";
                     for (int i=len; i<key.size; i++)
                         curr->word.push_back(key.data[i]);
                     curr->value = (Slice *)malloc(sizeof(Slice));
@@ -136,11 +134,11 @@ class Trie {
                                                 : key.data[len] - 65;
                 if(curr->arr[x] == NULL && curr!=root && curr->value==NULL) {
                     curr->is_word = true;
-                    curr->word = "E";
+                    // cout << curr->word <<endl;
                     for (int i=len; i<key.size; i++)
                     {
-                        // printf("Index: %d data %c\n", i, key.data[i]);
-                        curr->word.push_back(key.data[i]);
+                        // cout << key.data[i] <<" appended\n";
+                        curr->word += key.data[i];
                     }
                     curr->value = (Slice *)malloc(sizeof(Slice));
                     curr->value->size = value.size;
@@ -153,6 +151,7 @@ class Trie {
                 else if(curr->arr[x] == NULL)
                 {
                     TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
+                    // cout << "character " << key.data[len] << " created from index "<< len<<endl;
                     new_node->letter = key.data[len];
                     new_node->children = 0;
                     for (int i = 0; i < 52; i++) {
@@ -170,7 +169,7 @@ class Trie {
                         x = (key.data[len+1] > 90) ? key.data[len+1] - 97 + 26
                                                 : key.data[len+1] - 65;
                         Slice new_key(curr->word);
-                        cout<< "Existing word is "<<curr->word<<endl;
+                        cout<<"Existing word is "<<curr->word<<endl;
                         cout<<"Inserting with root as "<<curr->letter<<endl;
                         insert(new_key, curr->value, curr);
                         curr->word = "ERROR";
