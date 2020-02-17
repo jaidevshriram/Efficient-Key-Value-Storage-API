@@ -119,8 +119,12 @@ class Trie {
     }
 
     bool del(Slice &key) {
+        Slice v;
+        if (!get_val(key, v))
+            return 0;
         int len = 0;
         TrieNode *curr = root;
+
         while (curr != NULL) {
             curr->children--;
             if (len < key.size) {
@@ -210,6 +214,12 @@ class Trie {
         // cur.arr['a'] = &cur;
         // cout << endl;
     }
+
+    bool del_N(int n) {
+        Slice a, b;
+        get_val_N(n, a, b);
+        del(a);
+    }
 };
 
 int main(void) {
@@ -233,6 +243,7 @@ int main(void) {
     // cout << t.get_val(a, val) << endl;
     // t.del(b);
     // cout<< t.get_val(b, val) <<endl;
+    cout << t.del_N(1) << '\n';
     cout << t.get_val_N(1, a, val) << '\n';
     cout << a.data << '\n';
     cout << val.data << '\n';
