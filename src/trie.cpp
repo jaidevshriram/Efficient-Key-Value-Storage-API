@@ -56,6 +56,48 @@ class Trie {
         delete_recursive(root);
     }
 
+    void insert(Slice &key, Slice &value, TrieNode* curr) {
+        int len = 0;
+        while (curr != NULL) {
+            curr->children++;
+            if (len < key.size) {
+                int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
+                                                : key.data[len] - 65;
+                if(curr->arr[x] == NULL) {
+                    curr -> is_word = true;
+                    for (int i=len; i<key.size; i++)
+                        curr->word.push_back(key.data[i]);
+                    return;
+                }
+                else {
+                    TrieNode *prev = curr;
+                    curr = (TrieNode*)curr->arr[x];
+                    if (curr->is_word) {
+                        curr->is_word = false;
+                        x = (key.data[len+1] > 90) ? key.data[len+1] - 97 + 26
+                                                : key.data[len+1] - 65;
+                        int y = (curr->word[0] > 90 ) ? curr->word[0] - 97 + 25 : curr->word[0] - 65;
+                        curr->arr[x] = (TrieNode *)malloc(sizeof(TrieNode));
+                        curr->arr[y] = (TrieNode *)malloc(sizeof(TrieNode));
+                        Slice new_key(curr->word);
+                        insert(new_key, *(curr->value), prev);
+                    }
+                }
+            } else if (len == key.size) {
+                // curr->value.data = value.data;
+                curr->value = (Slice *)malloc(sizeof(Slice));
+                curr->value->size = value.size;
+                curr->value->data = (char *)malloc(sizeof(char) * value.size);
+                for (int j = 0; j < value.size; j++) {
+                    curr->value->data[j] = value.data[j];
+                }
+                // cout << curr->value.data << '\n';
+                return;           
+            }
+            len++;
+        }
+    }
+
     void insert(Slice &key, Slice &value) {
         int len = 0;
         TrieNode *curr = root;
@@ -64,16 +106,46 @@ class Trie {
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                                 : key.data[len] - 65;
-                if(curr->arr[x] == NULL) {
+                if(curr->arr[x] == NULL && curr!=root) {
                     curr -> is_word = true;
-                    for (int i=len; i<key.size; k++)
-                        curr->word.append(key.data[i]);
+                    for (int i=len; i<key.size; i++)
+                        curr->word.push_back(key.data[i]);
+                    return;
+                }
+                else if(curr->arr[x] == NULL)
+                {
+                    TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
+                    new_node->letter = key.data[len];
+                    new_node->children = 0;
+                    for (int i = 0; i < 52; i++) {
+                        new_node->arr[i] = NULL;
+                    }
+                    new_node->value = NULL;
+                    curr->arr[x] = new_node;
+                    curr = (TrieNode *)curr->arr[x];
                 }
                 else {
-                    
+                    TrieNode *prev = curr;
+                    curr = (TrieNode*)curr->arr[x];
+                    if (curr->is_word) {
+                        curr->is_word = false;
+                        x = (key.data[len+1] > 90) ? key.data[len+1] - 97 + 26
+                                                : key.data[len+1] - 65;
+                        int y = (curr->word[0] > 90 ) ? curr->word[0] - 97 + 25 : curr->word[0] - 65;
+                        Slice new_key(curr->word);
+                        insert(new_key, *(curr->value), curr);
+                    }
                 }
             } else if (len == key.size) {
-
+                // curr->value.data = value.data;
+                curr->value = (Slice *)malloc(sizeof(Slice));
+                curr->value->size = value.size;
+                curr->value->data = (char *)malloc(sizeof(char) * value.size);
+                for (int j = 0; j < value.size; j++) {
+                    curr->value->data[j] = value.data[j];
+                }
+                // cout << curr->value.data << '\n';
+                return;           
             }
             len++;
         }
@@ -88,6 +160,10 @@ class Trie {
                                              : key.data[len] - 65;
                 if (curr->arr[x] == NULL)
                     return 0;
+
+                if(curr->is_word)
+                    return 1;
+
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
                 if (curr->value == NULL)
@@ -144,22 +220,48 @@ class Trie {
 
         return 1;
     }
+
+    void display(TrieNode *root, int level)
+    {
+        if (root == NULL)
+            return;
+        
+        printf("---------\nLevel %d\n", level);
+        cout << "Children: "<<root->children <<endl;
+        cout << "Is_word:" << root->is_word<<endl;
+        if(root->is_word)
+        {
+            cout <<root->letter<<endl;
+            cout <<root->word<<endl;
+        }
+        else
+        {
+            cout << "Letter:"<< root->letter<<endl;;
+            for(int i=0; i<52; i++)
+                display((TrieNode *)root->arr[i], level + 1);
+        }
+    }
+
+    void display()
+    {
+        display(root, 0);
+    }
 };
 
-// int main(void) {
-//     Trie t;
-//     Slice a("n");
-//     Slice b("na");
-//     // Slice c("nb");
-//     Slice val("ragsga");
+int main(void) {
+    Trie t;
+    Slice a("ab");
+    Slice b("bb");
+    Slice c("abb");
+    Slice val("ragsga");
 
-//     t.insert(a, val);
-//     t.insert(b, val);
-//     // t.insert(c, val);
-
-//     cout << t.del(a) << endl;
-//     cout << t.get_val(a, val) << endl;
-//     // t.del(b);
-//     // cout<< t.get_val(b, val) <<endl;
-//     return 0;
-// }
+    t.insert(a, val);
+    t.insert(b, val);
+    t.insert(c, val);
+    t.display();
+    // cout << t.del(a) << endl;
+    cout << t.get_val(a, val) << endl;
+    // t.del(b);
+    cout<< t.get_val(b, val) <<endl;
+    return 0;
+}
