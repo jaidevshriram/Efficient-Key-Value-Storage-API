@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#include "../src/trie.cpp"
+#include "../src/trie-bst.cpp"
 using namespace std;
 
 class kvstore{
