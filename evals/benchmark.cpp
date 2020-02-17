@@ -100,7 +100,7 @@ int main()
     srand(time(0));
     struct timespec start, end;
     double time = 0, t;
-    int n = 4000000;
+    int n = 1000000;
 	// for(int i=0;i<100000;i++)
 	for(int i=0;i<n;i++)
 	{
