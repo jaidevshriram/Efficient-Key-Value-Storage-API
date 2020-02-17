@@ -27,8 +27,9 @@ class Trie {
         int children;
     };
 
-   public:
     TrieNode *root = (TrieNode *)malloc(sizeof(TrieNode));
+
+   public:
     Trie() {
         root->letter = '&';
         root->children = 0;
@@ -219,18 +220,6 @@ class Trie {
         get_val_N(n, a, b);
         del(a);
     }
-
-    int count_ptr(TrieNode *a) {
-        int x = 0;
-        // int x = 0;
-        for (int i = 0; i < 52; i++) {
-            if (a->arr[i] != NULL) {
-                x++;
-                x += count_ptr((TrieNode *)a->arr[i]);
-            }
-        }
-        return x;
-    }
 };
 
 int main(void) {
@@ -270,6 +259,5 @@ int main(void) {
     cout << t.get_val_N(5, a, val) << '\n';
     cout << a.data << '\n';
     cout << val.data << '\n';
-    cout << t.count_ptr(t.root) << " " << t.root->children << '\n';
     return 0;
 }
