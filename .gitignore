@@ -34,3 +34,5 @@
 # Test files
 test-input
 test-output
+
+.vscode
