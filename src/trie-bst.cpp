@@ -141,6 +141,8 @@ class BST {
 
 
 struct TrieNode {
+    TrieNode() : arr() { }
+
     char letter;
     // map<char, void *> mp;
     // void *arr[52];
@@ -151,7 +153,7 @@ struct TrieNode {
 
 class Trie {
    public:
-    TrieNode *root = (TrieNode *)malloc(sizeof(TrieNode));
+    TrieNode *root = new TrieNode();
     Trie() {
         root->letter = '&';
         root->children = 0;
@@ -169,7 +171,7 @@ class Trie {
                 // if (curr->arr[x] == NULL) {
                 Node * xVal = curr->arr.get(x);
                 if (!xVal) {
-                    TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
+                    TrieNode *new_node = new TrieNode();
                     new_node->letter = key.data[len];
                     new_node->children = 0;
                     new_node->value = NULL;
