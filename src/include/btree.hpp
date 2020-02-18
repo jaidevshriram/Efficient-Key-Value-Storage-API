@@ -21,6 +21,8 @@ class BTreeNode {
     // A function to traverse all nodes in a subtree rooted with this node
     void traverse();
 
+    void get(int N, int & counter, keyVal & ans);
+
     // A function to search a key in subtree rooted with this node.
     searchStruct *search(string k);  // returns NULL if k is not present.
 
@@ -102,6 +104,11 @@ class BTree {
         t = _t;
     }
 
+    void get(int N, keyVal & kv) {
+        int counter = 0;
+        root->get(N, counter, kv);
+    }
+
     void traverse() {
         if (root != NULL)
             root->traverse();
@@ -144,12 +151,28 @@ void BTreeNode::traverse() {
         // traverse the subtree rooted with child C[i].
         if (leaf == false)
             C[i]->traverse();
+
         cout << " " << keys[i].key << "::" << keys[i].value;
     }
 
     // Print the subtree rooted with last child
     if (leaf == false)
         C[i]->traverse();
+}
+
+void BTreeNode::get(int N, int & counter, keyVal & kv) {
+    int i;
+    for (i = 0; i < n; i++) {
+        if (leaf == false)
+            C[i]->get(N, counter, kv);
+
+        counter++;
+        if(counter == N)
+            kv = keys[i];
+    }
+
+    if (leaf == false)
+        C[i]->get(N, counter, kv);
 }
 
 // Function to search key k in subtree rooted with this node
@@ -574,26 +597,12 @@ int main() {
     BTree t(3);  // A B-Tree with minium degree 3
 
     t.insert((keyVal){"1", "1abcd"});
-
     t.insert((keyVal){"2", "2abcd"});
     t.insert((keyVal){"3", "3abcd"});
     t.insert((keyVal){"4", "4abcd"});
-
     t.insert((keyVal){"5", "5abcd"});
     t.insert((keyVal){"6", "6abcd"});
-
-    cout << "Traversal of tree constructed is\n";
-    t.traverse();
-    cout << endl;
-
     t.insert((keyVal){"7", "7abcd"});
-
-    cout << "Traversal of tree constructed is\n";
-    t.traverse();
-    cout << endl;
-
-    return 0;
-
     t.insert((keyVal){"8", "8abcd"});
     t.insert((keyVal){"9", "9abcd"});
     t.insert((keyVal){"10", "10abcd"});
@@ -602,34 +611,8 @@ int main() {
     t.traverse();
     cout << endl;
 
-    t.insert((keyVal){"11", "11abcd"});
-    t.insert((keyVal){"12", "12abcd"});
-    t.insert((keyVal){"13", "13abcd"});
-    t.insert((keyVal){"14", "14abcd"});
-    t.insert((keyVal){"15", "15abcd"});
-    t.insert((keyVal){"16", "16abcd"});
-    t.insert((keyVal){"17", "17abcd"});
-    t.insert((keyVal){"18", "18abcd"});
-    t.insert((keyVal){"19", "19abcd"});
-    t.insert((keyVal){"20", "20abcd"});
-    t.insert((keyVal){"21", "21abcd"});
-    t.insert((keyVal){"22", "22abcd"});
-    t.insert((keyVal){"23", "23abcd"});
-    t.insert((keyVal){"24", "24abcd"});
-    t.insert((keyVal){"25", "25abcd"});
-    t.insert((keyVal){"26", "26abcd"});
-
-    cout << "Traversal of tree constructed is\n";
-    t.traverse();
-    cout << endl;
-
     t.remove("6");
     cout << "Traversal of tree after removing 6\n";
-    t.traverse();
-    cout << endl;
-
-    t.remove("13");
-    cout << "Traversal of tree after removing 13\n";
     t.traverse();
     cout << endl;
 
@@ -648,26 +631,6 @@ int main() {
     t.traverse();
     cout << endl;
 
-    t.remove("16");
-    cout << "Traversal of tree after removing 16\n";
-    t.traverse();
-    cout << endl;
-
     return 0;
-}
-*/
-
-/*
-int main() {
-    BTree t(3);
-
-    t.insert((keyVal) { "ksGdbNHUXTgCnMwcpCRbXgvmYHrSwoSGGylHOTdLok", "1" });
-    t.insert((keyVal) { "dqkBibGEnoFmbVOoFVxdsvLqKIRXg", "1" });
-
-    t.remove("ksGdbNHUXTgCnMwcpCRbXgvmYHrSwoSGGylHOTdLok");
-    searchStruct * s = t.search("ksGdbNHUXTgCnMwcpCRbXgvmYHrSwoSGGylHOTdLok");
-    cout << (s && s->exists) << endl;
-    t.traverse();
-    cout << endl;
 }
 */
