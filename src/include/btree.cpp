@@ -21,7 +21,7 @@ class BTreeNode {
     // A function to traverse all nodes in a subtree rooted with this node
     void traverse();
 
-    void get(int N, int & counter, keyVal & ans);
+    void get(int N, int &counter, keyVal &ans);
 
     // A function to search a key in subtree rooted with this node.
     searchStruct *search(string k);  // returns NULL if k is not present.
@@ -104,7 +104,7 @@ class BTree {
         t = _t;
     }
 
-    void get(int N, keyVal & kv) {
+    void get(int N, keyVal &kv) {
         int counter = 0;
         root->get(N, counter, kv);
     }
@@ -160,14 +160,14 @@ void BTreeNode::traverse() {
         C[i]->traverse();
 }
 
-void BTreeNode::get(int N, int & counter, keyVal & kv) {
+void BTreeNode::get(int N, int &counter, keyVal &kv) {
     int i;
     for (i = 0; i < n; i++) {
         if (leaf == false)
             C[i]->get(N, counter, kv);
 
         counter++;
-        if(counter == N)
+        if (counter == N)
             kv = keys[i];
     }
 
@@ -592,7 +592,6 @@ void BTree::remove(string k) {
 }
 
 // Driver program to test above functions
-/*
 int main() {
     BTree t(3);  // A B-Tree with minium degree 3
 
@@ -633,4 +632,3 @@ int main() {
 
     return 0;
 }
-*/
