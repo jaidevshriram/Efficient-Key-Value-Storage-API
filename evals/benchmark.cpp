@@ -108,32 +108,32 @@ int main()
 		string value = random_value(v);
 		map<string,string>:: iterator itr = db.find(key);
 		if (itr == db.end()) {
-			struct timespec ts;
-			clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-			long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
 			db.insert(pair<string,string>(key,value));
-			clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-			long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
-			total += (en-st);
 			cout << "PUT " << key << endl;
             // printf("%7d\r", i);
 			bool check1 = kv.get(key);
-	                if(check1 == true)
-                        {
-                            kv.display();
-                            printf("False detect\n");
-                            break;
-                        }
-            
-                        bool ans = kv.put(key,value);
+			if(check1 == true)
+			{
+				kv.display();
+				printf("False detect\n");
+				break;
+			}
+
+			struct timespec ts;
+			clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+			long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
+			bool ans = kv.put(key,value);
+			clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+			long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
+			total += (en-st);
 			bool check2 = kv.get(key);
 			if(check2 == false)
-                        {
-                            kv.display();
-                            printf("ERROR. Not detected.\n");
-                            break;
-                        }
-                        db_size++;
+			{
+				kv.display();
+				printf("ERROR. Not detected.\n");
+				break;
+			}
+			db_size++;
 		}
 		else
 			i--;
