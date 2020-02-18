@@ -112,7 +112,7 @@ int main()
 			db.insert(pair<string,string>(key,value));
 			// cout << "PUT " << key << endl;
             printf("%7d\r", i);
-			bool check1 = kv.get(key);
+			// ``bool check1 = kv.get(key);
 			clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
 			long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
 			bool ans = kv.put(key,value);

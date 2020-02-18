@@ -233,6 +233,7 @@ class Trie {
     }
 };
 
+/*
 int main(void) {
     Trie t;
     Slice a("n");
@@ -273,3 +274,4 @@ int main(void) {
     cout << t.count_ptr(t.root) << " " << t.root->children << '\n';
     return 0;
 }
+*/
