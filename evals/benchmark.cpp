@@ -100,7 +100,7 @@ int main()
     srand(time(0));
     struct timespec start, end;
     double time = 0, t;
-    int n = 1000000;
+    int n = 9500000;
 	// for(int i=0;i<100000;i++)
 	for(int i=0;i<n;i++)
 	{
@@ -124,6 +124,7 @@ int main()
 
     time = 0;
 
+    /*
 	for(int i=0;i<10000;i++)
 	{
 		int x = rand()%3;
@@ -232,6 +233,7 @@ int main()
 			return 0;
 		}
 	}
+*/
 
     printf("\n%lf\n", time);
 

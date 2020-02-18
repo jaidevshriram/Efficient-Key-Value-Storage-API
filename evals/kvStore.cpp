@@ -11,7 +11,7 @@ class kvstore {
     public:
         BTree t;
 
-        kvstore() : t(3) { }
+        kvstore() : t(5) { }
 
         bool get(string key) {
             searchStruct * res = t.search(key);
