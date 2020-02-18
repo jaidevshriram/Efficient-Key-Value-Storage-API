@@ -7,19 +7,20 @@ public:
 	Trie db;
 
 	bool get(string key){
-		Slice a(key), b;
+		Slice a(key.data()), b;
 		bool is_valid = db.get_val(a, b);
 		return is_valid;
 	}
 
 	bool put(string key, string value){
-		Slice a(key), b(value);
+		Slice a(key.data()), b(value.data());
+		//printf("%d - %s\n", a.size, a.data);
 		db.insert(a, b);
-		return true;
+                return true;
 	}
 
 	bool del(string key){
-		Slice a(key);
+		Slice a(key.data());
 		bool is_valid = db.del(a);
 		return is_valid;
 	}
@@ -34,4 +35,8 @@ public:
 		// Your Code Here
 		return true;
 	}
+
+        void display() {
+            db.display();
+        }
 };

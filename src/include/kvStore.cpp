@@ -6,8 +6,6 @@
 using namespace std;
 
 struct Slice {
-
-public:
     uint8_t size;
     char* data;
 

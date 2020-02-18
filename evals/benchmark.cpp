@@ -100,7 +100,7 @@ int main()
 	srand(time(0));
 	// for(int i=0;i<100000;i++)
 	long double total = 0;
-	for(int i=0;i<1000000;i++)
+	for(int i=0;i<100000;i++)
 	{
 		int k = rand()%64 + 1;
 		int v = rand()%256 + 1;
@@ -118,9 +118,22 @@ int main()
 			cout << "PUT " << key << endl;
             // printf("%7d\r", i);
 			bool check1 = kv.get(key);
-			bool ans = kv.put(key,value);
+	                if(check1 == true)
+                        {
+                            kv.display();
+                            printf("False detect\n");
+                            break;
+                        }
+            
+                        bool ans = kv.put(key,value);
 			bool check2 = kv.get(key);
-			db_size++;
+			if(check2 == false)
+                        {
+                            kv.display();
+                            printf("ERROR. Not detected.\n");
+                            break;
+                        }
+                        db_size++;
 		}
 		else
 			i--;
