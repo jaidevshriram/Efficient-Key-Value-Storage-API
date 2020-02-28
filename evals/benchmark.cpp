@@ -45,7 +45,8 @@ string random_value(int stringLength){
 }
 
 const uint MAX_KEYS = 10000000,
-      INSERTS = 100000;
+      INSERTS = 100000,
+      NUM_OPS = 100000;
 long CLOCKS_PER_SECOND = 1000000;
 kvStore kv(MAX_KEYS);
 map<string,string> db;
@@ -128,8 +129,7 @@ long long db_size = 0;
 struct timespec ts;
 long double st, en, total = 0;
 
-int main()
-{
+int main() {
     long double total = 0;
 
 	for(int i=0;i < INSERTS;i++) {
@@ -147,6 +147,10 @@ int main()
         total += (en - st);
 		db_size = db.size();
         printf("\r%8d", i);
+
+        if(key == "Fya") {
+            cout << "\rPUT Fya        \n";
+        }
 	}
 
     printf("\rInsertion of %u values took %Lfs\n", INSERTS, total);
@@ -155,8 +159,8 @@ int main()
 
 	bool incorrect = false;
 
-	for(int i=0;i<10000;i++) {
-		int x = rand() % 3;
+	for(int i=0;i<NUM_OPS;i++) {
+		int x = rand() % 1;
 		if(x==0) {
             // DESCRIPTION: GET
 			string key = random_key(rand()%64 + 1);
@@ -173,7 +177,8 @@ int main()
 			map<string,string>:: iterator itr = db.find(key);
 			if((ans==false && itr != db.end()) || (ans==true && itr->second != sliceToStr(s_value) )) {
                 incorrect = true;
-                cout << "Key found in kv? " << ans << "\nKey found in db? " << itr->second << endl;
+                cout << "\rIncorrect PUT for key " << key << "\nFound in kv? " << ans
+                    << "\nFound in db? " << (itr->second != sliceToStr(s_value)) << endl;
             }
 		} else if(x==1) {
             // DESCRIPTION: PUT
@@ -205,7 +210,7 @@ int main()
 			if(false && (check2 == false || value != sliceToStr(check))) {
                 incorrect = true;
                 // TODO
-                cout << "Some error with put, will check later" << endl;
+                cout << "\rSome error with put, will check later" << endl;
             }
 		} else if(x==2) {
             // DESCRIPTION: DELETE
@@ -229,7 +234,7 @@ int main()
 			bool check2 = kv.get(s_key,s_value);
 			if(check2 == true) {
                 incorrect = true;
-                cout << "Expected to not find key " << key << " in kv, found it" << endl;
+                cout << "\rExpected to not find key " << key << " in kv, found it" << endl;
             }
 		} else if(x==3) {
             // DESCRIPTION: GET N
@@ -248,7 +253,7 @@ int main()
 
 			if( itr->first != sliceToStr(s_key) || itr->second != sliceToStr(s_value)) {
                 incorrect = true;
-                cout << "get(n)\nkeys same? " << (itr->first == sliceToStr(s_key))
+                cout << "\rget(n)\nkeys same? " << (itr->first == sliceToStr(s_key))
                     << "\nvalues same? " << (itr->second == sliceToStr(s_value)) << endl;
             }
 		} else if(x==4) {
@@ -273,15 +278,20 @@ int main()
 
 			if(check2 == true) {
                 incorrect = true;
-                cout << "Found nth key " << key << "pair after deleting\n";
+                cout << "\rFound nth key " << key << "pair after deleting\n";
             }
 		}
 
+        cout << "\r" << i;
+
         if(incorrect == true) {
-            cout << "Error for operation " << DESCRIPTION[x] << endl;
+            cout << "\rError in operation " << DESCRIPTION[x] << endl;
             return 0;
         }
 	}
+
+    cout << "\r" << NUM_OPS << " operations finished in " << total << "s\n";
+
     /* 
      * MODIFIED
      * Commented out till the end
