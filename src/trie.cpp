@@ -5,6 +5,11 @@
 using namespace std;
 
 struct Slice {
+    /*
+     * TODO
+     * uint8_t will take much less space (4x lesser)
+     * have to check if it works
+     */
     int size;
     char* data;
 
@@ -232,12 +237,12 @@ class Trie {
                 {
                     int temp_len = len;
 
-                    if(strlen(curr->word) != (key.size - temp_len))
+                    if(strlen(curr->word) != (uint)(key.size - temp_len))
                     {
                         return 0;
                     }
                     
-                    for(int i=0; i<strlen(curr->word); i++)
+                    for(uint i=0; i<strlen(curr->word); i++)
                     {
                         if(key.data[temp_len + i] != curr->word[i])
                             return 0;
@@ -275,6 +280,9 @@ class Trie {
 
             len++;
         }
+
+        // TODO: yoogottamk added this, need to verify with overall logic
+        return 0;
     }
 
     int del(Slice &key) {
