@@ -21,7 +21,7 @@ struct Slice {
         if(size == 0)
         {
             printf("\t\033[1;31mTHERE IS NO STRING WHAT EVEN IS HAPPENING\033[0m\n");
-            exit(-1);
+            //exit(-1);
         }
 
         data = (char *)malloc(size + 1);
@@ -232,6 +232,10 @@ class Trie {
     bool get_val(Slice &key, Slice &value) {
         int len = 0;
         TrieNode *curr = root;
+        
+        if(curr == NULL)
+            return 0;
+
         while (curr != NULL) {
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
@@ -282,6 +286,7 @@ class Trie {
                     return 1;
                 }
             }
+
             len++;
         }
     }

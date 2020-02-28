@@ -100,7 +100,7 @@ int main()
 	srand(time(0));
 	// for(int i=0;i<100000;i++)
 	long double total = 0;
-	for(int i=0;i<10000;i++)
+	for(int i=0;i<1000000;i++)
 	{
 		int k = rand()%64 + 1;
 		int v = rand()%256 + 1;
@@ -110,7 +110,7 @@ int main()
 		if (itr == db.end()) {
 			db.insert(pair<string,string>(key,value));
 			//cout << "PUT " << key << endl;
-                        //printf("\r%8d", i);
+                        printf("\r%8d", i);
 			bool check1 = kv.get(key);
 			if(check1 == true)
 			{
@@ -247,7 +247,7 @@ int main()
 	}
 	*/
 
-	cout <<"TIme: "<< total<<endl;
+	cout <<"Time: "<< total<<endl;
 
 	int threads = 4;
 
