@@ -2,42 +2,45 @@
 #include "../src/trie.cpp"
 using namespace std;
 
-class kvstore{
+class kvStore{
+    uint64_t maxSize;
+
 public:
-	Trie db;
+    kvStore(uint64_t maxSize) {
+        this->maxSize = maxSize;
+    }
 
-	bool get(string key){
-		Slice a(key.data()), b;
-                //cout<<"done creating "<<key.data()<<"\n";
-		bool is_valid = db.get_val(a, b);
-                //cout<<"done getting\n";
-		return is_valid;
-	}
+    Trie db;
 
-	bool put(string key, string value){
-                Slice a(key.data()), b(value.data());
-                db.insert(a, b);
-                return true;
-	}
+    bool get(Slice & key, Slice & value){
+        return db.get_val(key, value);
+    }
 
-	bool del(string key){
-		Slice a(key.data());
-		bool is_valid = db.del(a);
-		return is_valid;
-	}
+    bool put(Slice & key, Slice & value){
+        db.insert(key, value);
 
-	pair<string,string> get(int N){
-		// Your Code Here
-		pair<string,string> temp = make_pair("key","value");
-		return temp;
-	}
+        /*
+         * TODO
+         * insert doesn't replace old values
+         */
+        return true;
+    }
 
-	bool del(int N){
-		// Your Code Here
-		return true;
-	}
+    bool del(Slice & key){
+        return db.del(key);
+    }
 
-        void display() {
-            db.display();
-        }
+    bool get(int N, Slice & key, Slice & value) {
+        // TODO: implement this
+        return true;
+    }
+
+    bool del(int N){
+        // TODO: implement this
+        return true;
+    }
+
+    void display() {
+        db.display();
+    }
 };
