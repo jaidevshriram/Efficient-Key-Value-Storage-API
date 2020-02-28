@@ -177,7 +177,7 @@ int main() {
 			map<string,string>:: iterator itr = db.find(key);
 			if((ans==false && itr != db.end()) || (ans==true && itr->second != sliceToStr(s_value) )) {
                 incorrect = true;
-                cout << "\rIncorrect PUT for key " << key << "\nFound in kv? " << ans
+                cout << "\rIncorrect GET for key " << key << "\nFound in kv? " << ans
                     << "\nFound in db? " << (itr->second != sliceToStr(s_value)) << endl;
             }
 		} else if(x==1) {
