@@ -16,16 +16,17 @@ struct Slice {
 
     Slice(const char *a)
     {
-        size = strlen(a);
+        size = strlen(a);   
         
         if(size == 0)
         {
-            // printf("\t\033[1;31mTHERE IS NO STRING WHAT EVEN IS HAPPENING\033[0m\n");
-            //exit(-1);
+            printf("\t\033[1;31mTHERE IS NO STRING WHAT EVEN IS HAPPENING\033[0m\n");
+            exit(-1);
         }
 
         data = (char *)malloc(size + 1);
         strcpy(data, a);
+        
         //printf("%s from %s : DONE COPYING\n", data, a);
     }
 };
@@ -81,13 +82,14 @@ class Trie {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                                 : key.data[len] - 65;
                 if(curr->arr[x] == NULL && curr!=new_root) {
-                    //cout << "Compression"<<endl;
                     curr -> is_word = true;
-                    char *temp = (char *)malloc(key.size - len + 2);
+                    printf("%d allocated\n", key.size - len);
+                    char *temp = (char *)malloc(key.size - len);
                     strncpy(temp, key.data + len, key.size - len );
                     //printf("This word was added: %s\n", temp);
                     curr->word = temp;
                     curr->value = (Slice *)malloc(sizeof(Slice));
+                    //cout<<"Allocated\n";
                     curr->value->size = value->size;
                     curr->value->data = (char *)malloc(sizeof(char) * value->size);
                     for (int j = 0; j < value->size; j++) {
@@ -158,7 +160,7 @@ class Trie {
                     }
                     
                     strncpy(temp, key.data + len, key.size - len);
-                    temp[key.size - len] = '\0';
+                    temp[key.size - len - 1] = '\0';
                     //printf("This word was added: %s\n", temp);
                     curr->word = temp;
                     //printf("Word in the trie is now %s, was meant to be latter of %s\n", curr->word, key.data);
@@ -190,9 +192,15 @@ class Trie {
                         curr->is_word = false;
                         x = (key.data[len+1] > 90) ? key.data[len+1] - 97 + 26
                                                 : key.data[len+1] - 65;
-                        //cout<<"Existing word is "<<curr->word<<endl;
+                        if(strlen(curr->word) == 0)
+                        {
+                            printf("%c is letter\n", curr->letter);
+                        }
+                        //printf("Length of word is %d\n", strlen(curr->word));
+
                         //cout<<"Inserting with root as "<<curr->letter<<endl;
                         Slice new_key(curr->word);
+                        free(curr->word);
                         insert(new_key, curr->value, curr);
                         curr->value = NULL;
                     }

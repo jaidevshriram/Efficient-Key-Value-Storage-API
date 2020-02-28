@@ -8,14 +8,15 @@ public:
 
 	bool get(string key){
 		Slice a(key.data()), b;
+                //cout<<"done creating "<<key.data()<<"\n";
 		bool is_valid = db.get_val(a, b);
+                //cout<<"done getting\n";
 		return is_valid;
 	}
 
 	bool put(string key, string value){
-		Slice a(key.data()), b(value.data());
-		//printf("%d - %s\n", a.size, a.data);
-		db.insert(a, b);
+                Slice a(key.data()), b(value.data());
+                db.insert(a, b);
                 return true;
 	}
 

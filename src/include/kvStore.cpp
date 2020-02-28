@@ -16,6 +16,11 @@ struct Slice {
         data = malloc(a.length());
         memcpy(data, a.data(), a.length());
     }
+
+    ~Slice()
+    {
+        free(data);
+    }
 };
 
 // class kvStore {

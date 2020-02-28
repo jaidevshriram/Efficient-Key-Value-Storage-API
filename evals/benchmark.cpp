@@ -19,12 +19,12 @@ string random_key(int stringLength){
 string random_value(int stringLength){
 	string value = "";
 	string letters = "";
-	for(int i = 0;i<=255;i++)letters+=char(i);
+	for(int i =32;i<=127;i++)letters+=char(i);
 
 	for(int i=0;i<stringLength;i++)
-		value = value + letters[rand()%256];
+		value = value + letters[rand()%96];
 
-	return value;
+        return value;
 }
 
 long CLOCKS_PER_SECOND = 1000000;
@@ -100,7 +100,7 @@ int main()
 	srand(time(0));
 	// for(int i=0;i<100000;i++)
 	long double total = 0;
-	for(int i=0;i<1000000;i++)
+	for(int i=0;i<10000;i++)
 	{
 		int k = rand()%64 + 1;
 		int v = rand()%256 + 1;
@@ -110,7 +110,7 @@ int main()
 		if (itr == db.end()) {
 			db.insert(pair<string,string>(key,value));
 			// cout << "PUT " << key << endl;
-            printf("\r%8d", i);
+                        //printf("\r%8d", i);
 			bool check1 = kv.get(key);
 			if(check1 == true)
 			{
