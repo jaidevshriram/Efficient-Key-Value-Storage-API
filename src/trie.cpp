@@ -142,7 +142,7 @@ class Trie {
         }
     }
 
-    void insert(Slice &key, Slice &value) {
+    bool insertMain(Slice &key, Slice &value) {
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
@@ -171,7 +171,7 @@ class Trie {
                         curr->value->data[j] = value.data[j];
                     }
                     
-                    return;
+                    return true;
                 }
                 else if(curr->arr[x] == NULL)
                 {
@@ -210,10 +210,12 @@ class Trie {
                 for (int j = 0; j < value.size; j++) {
                     curr->value->data[j] = value.data[j];
                 }
-                return;           
+                return true;           
             }
             len++;
         }
+
+        return true;
     }
 
     bool get_val(Slice &key, Slice &value) {

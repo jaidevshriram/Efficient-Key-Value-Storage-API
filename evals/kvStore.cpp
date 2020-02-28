@@ -1,5 +1,9 @@
 #include<bits/stdc++.h>
+#include<chrono>
+#include<future>
+#include<thread>
 #include "../src/trie.cpp"
+
 using namespace std;
 
 class kvstore{
@@ -16,8 +20,8 @@ public:
 
 	bool put(string key, string value){
                 Slice a(key.data()), b(value.data());
-                db.insert(a, b);
-                return true;
+                auto result = async(launch::async, bind(&Trie::insertMain, &db, a, b));
+                return result.get();
 	}
 
 	bool del(string key){
