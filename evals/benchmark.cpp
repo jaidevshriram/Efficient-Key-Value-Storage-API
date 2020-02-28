@@ -51,6 +51,7 @@ long CLOCKS_PER_SECOND = 1000000;
 kvStore kv(MAX_KEYS);
 map<string,string> db;
 long long db_size = 0;
+uint OPS_COUNTER = 0;
 
 /* 
  * MODIFIED
@@ -159,7 +160,7 @@ int main() {
 
 	bool incorrect = false;
 
-	for(int i=0;i<NUM_OPS;i++) {
+	for(int i=0;i<NUM_OPS;i++, OPS_COUNTER++) {
 		int x = rand() % 1;
 		if(x==0) {
             // DESCRIPTION: GET
@@ -285,7 +286,7 @@ int main() {
         cout << "\r" << i;
 
         if(incorrect == true) {
-            cout << "\rError in operation " << DESCRIPTION[x] << endl;
+            cout << "\rError in operation " << DESCRIPTION[x] << "\n Completed " << OPS_COUNTER << " operations\n";
             return 0;
         }
 	}

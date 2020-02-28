@@ -225,27 +225,35 @@ class Trie {
         int len = 0;
         TrieNode *curr = root;
         
-        if(curr == NULL)
+        if(curr == NULL) {
+#ifdef EBUG
+            cout << "\r----------\nReturning 0 since root is NULL\n";
+#endif
             return 0;
+        }
 
         while (curr != NULL) {
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
 
-                if(curr!=root && curr->is_word)
-                {
+                if(curr!=root && curr->is_word) {
                     int temp_len = len;
 
-                    if(strlen(curr->word) != (uint)(key.size - temp_len))
-                    {
+                    if(strlen(curr->word) != (uint)(key.size - temp_len)) {
+#ifdef EBUG
+                        cout << "\r----------\nReturning 0 since\n(curr!=root && curr->is_word) &&\n(strlen(curr->word) != (uint)(key.size - temp_len))\n";
+#endif
                         return 0;
                     }
                     
-                    for(uint i=0; i<strlen(curr->word); i++)
-                    {
-                        if(key.data[temp_len + i] != curr->word[i])
+                    for(uint i=0; i<strlen(curr->word); i++) {
+                        if(key.data[temp_len + i] != curr->word[i]) {
+#ifdef EBUG
+                        cout << "\r----------\nReturning 0 since (curr!=root && curr->is_word) && (key.data[temp_len + i] != curr->word[i])\n";
+#endif
                             return 0;
+                        }
                     }
 
                     value.size = curr->value->size;
@@ -254,26 +262,43 @@ class Trie {
                         value.data[j] = curr->value->data[j];
                     }
 
+#ifdef EBUG
+                        cout << "\r----------\nReturning 1 since at end of (curr!=root && curr->is_word)\n";
+#endif
                     return 1;
                 }
 
-                if (curr->arr[x] == NULL)
+                if (curr->arr[x] == NULL) {
+#ifdef EBUG
+                        cout << "\r----------\nReturning 0 since (curr->arr[x] == NULL)\n";
+#endif
                     return 0;
+                }
 
                 curr = (TrieNode *)curr->arr[x];
             } else if (len == key.size) {
-                if (curr->value == NULL)
+                if (curr->value == NULL) {
+#ifdef EBUG
+                    cout << "\r----------\nReturning 0 since (len == key.size) && (curr->value == NULL)\n";
+#endif
                     return 0;
-                else {
-
-                    if(curr->is_word)
+                } else {
+                    if(curr->is_word) {
+#ifdef EBUG
+                        cout << "\r----------\nReturning 0 since (len == key.size) && (curr->is_word)\n";
+#endif
                         return 0;
+                    }
 
                     value.size = curr->value->size;
                     value.data = (char *)malloc(sizeof(char) * value.size);
                     for (int j = 0; j < value.size; j++) {
                         value.data[j] = curr->value->data[j];
                     }
+
+#ifdef EBUG
+                    cout << "\r----------\nReturning 1 since (len == key.size) && (curr->value !+ NULL)\n";
+#endif
                     return 1;
                 }
             }
@@ -282,6 +307,9 @@ class Trie {
         }
 
         // TODO: yoogottamk added this, need to verify with overall logic
+#ifdef EBUG
+        cout << "\r----------\nRandom return 0 to keep things going\n";
+#endif
         return 0;
     }
 
