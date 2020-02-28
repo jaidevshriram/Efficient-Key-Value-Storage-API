@@ -83,9 +83,17 @@ class Trie {
                                                 : key.data[len] - 65;
                 if(curr->arr[x] == NULL && curr!=new_root) {
                     curr -> is_word = true;
-                    printf("%d allocated\n", key.size - len);
-                    char *temp = (char *)malloc(key.size - len);
-                    strncpy(temp, key.data + len, key.size - len );
+                    //printf("%d allocated\n", key.size - len);
+                    char *temp = (char *)malloc(key.size - len + 3);
+                    
+                    if(temp == NULL)
+                    {
+                        printf("Malloc fail\n");
+                        exit(-1);
+                    }
+                    
+                    strncpy(temp, key.data + len, key.size - len + 1);
+                    temp[key.size - len] = '\0';
                     //printf("This word was added: %s\n", temp);
                     curr->word = temp;
                     curr->value = (Slice *)malloc(sizeof(Slice));
@@ -159,8 +167,9 @@ class Trie {
                         exit(-1);
                     }
                     
-                    strncpy(temp, key.data + len, key.size - len);
-                    temp[key.size - len - 1] = '\0';
+                    strncpy(temp, key.data + len, key.size - len + 1);
+                    temp[key.size - len] = '\0';
+                    //printf("size of word is %d\n", strlen(temp));
                     //printf("This word was added: %s\n", temp);
                     curr->word = temp;
                     //printf("Word in the trie is now %s, was meant to be latter of %s\n", curr->word, key.data);
