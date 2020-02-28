@@ -74,8 +74,10 @@ class Trie {
     }
 
     void insert(Slice &key, Slice* &value, TrieNode* curr) {
+        
         TrieNode *new_root = curr;
         int len = 0;
+        
         while (curr != NULL) {
             curr->children++;
             if (len < key.size) {
@@ -83,7 +85,6 @@ class Trie {
                                                 : key.data[len] - 65;
                 if(curr->arr[x] == NULL && curr!=new_root) {
                     curr -> is_word = true;
-                    //printf("%d allocated\n", key.size - len);
                     char *temp = (char *)malloc(key.size - len + 3);
                     
                     if(temp == NULL)
@@ -94,15 +95,16 @@ class Trie {
                     
                     strncpy(temp, key.data + len, key.size - len + 1);
                     temp[key.size - len] = '\0';
-                    //printf("This word was added: %s\n", temp);
                     curr->word = temp;
+                    
                     curr->value = (Slice *)malloc(sizeof(Slice));
-                    //cout<<"Allocated\n";
                     curr->value->size = value->size;
                     curr->value->data = (char *)malloc(sizeof(char) * value->size);
+                    
                     for (int j = 0; j < value->size; j++) {
                         curr->value->data[j] = value->data[j];
                     }
+                    
                     return;
                 }
                 else if(curr->arr[x] == NULL)
@@ -122,16 +124,10 @@ class Trie {
                     curr = (TrieNode *)curr->arr[x];
                 }
             } else if (len == key.size) {
-                // curr->value.data = value.data;
+                
                 if(curr == NULL || value==NULL)
                 {
                     cout << "NULL: Unreachable state!"<<endl;
-
-                }
-                else {
-                    //cout << "Assigning value now!" <<endl;
-                    //cout << key.data << " - " << key.size << " - " << len << endl;
-                    // cout << value.size << " -------- " << value.data << endl;
                 }
 
                 curr->value = (Slice *)malloc(sizeof(Slice));
@@ -140,7 +136,6 @@ class Trie {
                 for (int j = 0; j < value->size; j++) {
                     curr->value->data[j] = value->data[j];
                 }
-               // cout << curr->value->data << '\n';
                 return;           
             }
             len++;
@@ -157,8 +152,7 @@ class Trie {
                                                 : key.data[len] - 65;
                 if(curr->arr[x] == NULL && curr!=root && curr->value==NULL) {
                     curr->is_word = true;
-                    // cout << curr->word <<endl;
-                    //printf("Size : %d, len: %d\n", key.size, len);
+                    
                     char *temp = (char *)malloc(key.size - len + 3);
                     
                     if(temp == NULL)
@@ -169,22 +163,19 @@ class Trie {
                     
                     strncpy(temp, key.data + len, key.size - len + 1);
                     temp[key.size - len] = '\0';
-                    //printf("size of word is %d\n", strlen(temp));
-                    //printf("This word was added: %s\n", temp);
                     curr->word = temp;
-                    //printf("Word in the trie is now %s, was meant to be latter of %s\n", curr->word, key.data);
                     curr->value = (Slice *)malloc(sizeof(Slice));
                     curr->value->size = value.size;
                     curr->value->data = (char *)malloc(sizeof(char) * value.size);
                     for (int j = 0; j < value.size; j++) {
                         curr->value->data[j] = value.data[j];
                     }
+                    
                     return;
                 }
                 else if(curr->arr[x] == NULL)
                 {
                     TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
-                    //cout << "character " << key.data[len] << " created from index "<< len<<endl;
                     new_node->letter = key.data[len];
                     new_node->children = 0;
                     new_node->is_word = false;
@@ -205,9 +196,7 @@ class Trie {
                         {
                             printf("%c is letter\n", curr->letter);
                         }
-                        //printf("Length of word is %d\n", strlen(curr->word));
 
-                        //cout<<"Inserting with root as "<<curr->letter<<endl;
                         Slice new_key(curr->word);
                         free(curr->word);
                         insert(new_key, curr->value, curr);
@@ -215,14 +204,12 @@ class Trie {
                     }
                 }
             } else if (len == key.size) {
-                // curr->value.data = value.data;
                 curr->value = (Slice *)malloc(sizeof(Slice));
                 curr->value->size = value.size;
                 curr->value->data = (char *)malloc(sizeof(char) * value.size);
                 for (int j = 0; j < value.size; j++) {
                     curr->value->data[j] = value.data[j];
                 }
-                // cout << curr->value.data << '\n';
                 return;           
             }
             len++;
@@ -247,7 +234,6 @@ class Trie {
 
                     if(strlen(curr->word) != (key.size - temp_len))
                     {
-                        //printf("Fail 1. Length of remaining search string is %d actual is %d\n", key.size - temp_len, strlen(curr->word));
                         return 0;
                     }
                     
@@ -313,7 +299,6 @@ class Trie {
                 if (curr->value == NULL)
                     return 0;
                 else {
-                    // cout << curr->letter << " " << curr->children << endl;
                     if (curr->children == 0) {
                         free(curr);
                     } else {
