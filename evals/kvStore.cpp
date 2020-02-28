@@ -21,7 +21,7 @@ public:
 	bool put(string key, string value){
                 Slice a(key.data()), b(value.data());
                 auto result = async(launch::async, bind(&Trie::insertMain, &db, a, b));
-                return result.get();
+                return true;
 	}
 
 	bool del(string key){
