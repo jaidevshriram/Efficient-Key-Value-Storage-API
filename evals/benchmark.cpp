@@ -167,10 +167,6 @@ int main() {
 
         db_size = db.size();
         printf("\r%8d", i);
-
-        if(key == "Lff") {
-            cout << "\rPUT Lff        \n";
-        }
     }
 
     printf("\rInsertion of %u values took %Lfs\n", INSERTS, total);
@@ -180,10 +176,11 @@ int main() {
     bool incorrect = false;
 
     for(int i=0; i < NUM_OPS; i++, OPS_COUNTER++) {
-        int x = rand() % 1;
+        int x = rand() % 2;
         if(x==0) {
             // DESCRIPTION: GET
-            string key = random_key(rand()%64 + 1);
+            // string key = random_key(rand()%64 + 1);
+            string key = random_key(64);
             strToSlice(key,s_key);
 
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
