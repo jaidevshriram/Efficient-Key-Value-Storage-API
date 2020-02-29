@@ -242,7 +242,8 @@ class Trie {
 
                     if(strlen(curr->word) != (uint)(key.size - temp_len)) {
 #ifdef EBUG
-                        cout << "\r----------\nReturning 0 since\n(curr!=root && curr->is_word) &&\n(strlen(curr->word) != (uint)(key.size - temp_len))\n" << strlen(curr->word) << "::" << key.size << "-" << temp_len << "\n";
+                        cout << "\r----------\nReturning 0 since\n(curr!=root && curr->is_word) &&\n(strlen(curr->word) != (uint)(key.size - temp_len))\n"
+                            << curr->word << "(" << strlen(curr->word) << ")::" << key.size << "-" << temp_len << "\n";
 #endif
                         return 0;
                     }
