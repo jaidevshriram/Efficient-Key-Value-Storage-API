@@ -36,7 +36,7 @@ string random_key(int stringLength){
 string random_value(int stringLength){
     string v = "";
     string letters = "";
-    for(int i = 32;i<=127;i++)letters+=char(i);
+    for(int i = 32;i<127;i++)letters+=char(i);
 
     for(int i=0;i<stringLength;i++)
         v = v + letters[rand()%96];
@@ -197,7 +197,7 @@ int main() {
             if((ans==false && itr != db.end()) || (ans==true && itr->second != sliceToStr(s_value) )) {
                 incorrect = true;
                 cout << "\rIncorrect GET for key " << key << "\nFound in kv? " << ans
-                    << "\nFound in db? " << (itr->second != sliceToStr(s_value)) << endl;
+                    << "\nFound in db? " << (itr != db.end()) << "\nValues equal? " << (itr->second == sliceToStr(s_value)) << endl;
             }
         } else if(x==1) {
             // DESCRIPTION: PUT
