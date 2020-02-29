@@ -168,8 +168,8 @@ int main() {
         db_size = db.size();
         printf("\r%8d", i);
 
-        if(key == "Fya") {
-            cout << "\rPUT Fya        \n";
+        if(key == "Lff") {
+            cout << "\rPUT Lff        \n";
         }
     }
 
