@@ -88,7 +88,7 @@ void *myThreadFun(void *vargp) {
 int main() {
     srand(time(0));
     long double total = 0;
-    int n = 100000;
+    int n = 10000;
     for (int i = 0; i < n; i++) {
         int k = rand() % 64 + 1;
         int v = rand() % 256 + 1;
