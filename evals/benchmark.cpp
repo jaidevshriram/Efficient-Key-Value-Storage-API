@@ -191,7 +191,7 @@ int main() {
         if(x==0) {
             // DESCRIPTION: GET
             // string key = random_key(rand()%64 + 1);
-            string key = random_key(64);
+            string key = random_key(KEY);
             strToSlice(key,s_key);
 
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
