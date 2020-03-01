@@ -5,6 +5,9 @@
 #include "kvStore.cpp"
 using namespace std;
 
+#define KEY (rand() % 64 + 1)
+//  #define KEY 5
+
 const string DESCRIPTION[] = { "GET", "PUT", "DELETE", "GET N", "DELETE N" };
 
 string sliceToStr(Slice& a) {
@@ -137,13 +140,15 @@ struct timespec ts;
 long double st, en, total = 0;
 
 int main() {
+    srand(time(0));
     long double total = 0;
 
     for(int i=0;i < INSERTS;i++) {
-        string key = random_key(rand()%64 + 1);
+        // string key = random_key(rand()%64 + 1);
+        string key = random_key(KEY);
 
         while(db.find(key) != db.end())
-            key = random_key(rand()%64 + 1);
+            key = random_key(KEY);
 
         string value = random_value(rand()%255 + 1);
         db[key] = value;
@@ -185,8 +190,8 @@ int main() {
         int x = rand() % 2;
         if(x==0) {
             // DESCRIPTION: GET
-            string key = random_key(rand()%64 + 1);
-            //string key = random_key(64);
+            // string key = random_key(rand()%64 + 1);
+            string key = random_key(64);
             strToSlice(key,s_key);
 
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
@@ -206,7 +211,8 @@ int main() {
             }
         } else if(x==1) {
             // DESCRIPTION: PUT
-            int k = rand()%64 + 1;
+            // int k = rand()%64 + 1;
+            int k = KEY;
             int v = rand()%255 + 1;
             string key = random_key(k);
             string value = random_value(v);
