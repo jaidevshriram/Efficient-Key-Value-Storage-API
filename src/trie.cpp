@@ -2,6 +2,7 @@
 #include <string.h>
 #include <map>
 #include <bits/stdc++.h>
+
 using namespace std;
 
 struct Slice {
@@ -210,9 +211,7 @@ class Trie {
                         }
 
                         // TODO: problematic area
-                        Slice new_key(curr->word);
-                        free(curr->word);
-                        insert(new_key, curr->value, curr);
+                        insert(*curr->words, curr->value, curr);
                         curr->value = NULL;
                     }
                 }
@@ -256,8 +255,9 @@ class Trie {
 
                     if(curr->words->size != (uint)(key.size - temp_len)) {
 #ifdef EBUG
-                        cout << "\r----------\nReturning 0 since\n(curr!=root && curr->is_word) &&\n(strlen(curr->word) != (uint)(key.size - temp_len))\n"
-                            << curr->word << "(" << strlen(curr->word) << ")::" << key.size << "-" << temp_len << "\n";
+                        cout << "\r----------\nReturning 0 since\n(curr!=root && curr->is_word) &&\n(strlen(curr->word) != (uint)(key.size - temp_len))\n";
+                            curr->words->print();
+                            cout << "(" << curr->words->size << ")::" << key.size << "-" << temp_len << "\n";
 #endif
                         return 0;
                     }
