@@ -5,22 +5,15 @@
 using namespace std;
 
 struct Slice {
-    /*
-     * TODO
-     * uint8_t will take much less space (4x lesser)
-     * have to check if it works
-     */
-    int size;
+    uint8_t size;
     char* data;
 
-    Slice()
-    {
+    Slice() {
         size = 0;
         data = NULL;
     }
 
-    Slice(const char *a)
-    {
+    Slice(const char *a) {
         size = strlen(a);   
         
         if(size == 0)
@@ -34,6 +27,11 @@ struct Slice {
         
         //printf("%s from %s : DONE COPYING\n", data, a);
     }
+
+    void print() {
+        for(int i = 0; i < size; i++)
+            cout << data[i];
+    }
 };
 
 string sliceToStr2(Slice& a) {
@@ -45,12 +43,11 @@ string sliceToStr2(Slice& a) {
     return ret;
 }
 
-
 class Trie {
     struct TrieNode {
         char letter;
         bool is_word;
-        char *word;
+        Slice *words;
         void *arr[52];
         Slice *value;
         int children;
@@ -102,15 +99,14 @@ class Trie {
                     curr -> is_word = true;
                     char *temp = (char *)malloc(key.size - len + 3);
                     
-                    if(temp == NULL)
-                    {
+                    if(temp == NULL) {
                         printf("Malloc fail\n");
                         exit(-1);
                     }
                     
                     strncpy(temp, key.data + len, key.size - len + 1);
                     temp[key.size - len] = '\0';
-                    curr->word = temp;
+                    curr->words = new Slice(temp);
                     
                     curr->value = new Slice;
                     curr->value->size = value->size;
@@ -179,7 +175,7 @@ class Trie {
                     
                     strncpy(temp, key.data + len, key.size - len + 1);
                     temp[key.size - len] = '\0';
-                    curr->word = temp;
+                    curr->words = new Slice(temp);
                     curr->value = new Slice;
                     curr->value->size = value.size;
                     curr->value->data = (char *)malloc(sizeof(char) * value.size);
@@ -208,11 +204,12 @@ class Trie {
                         curr->is_word = false;
                         x = (key.data[len+1] > 90) ? key.data[len+1] - 97 + 26
                                                 : key.data[len+1] - 65;
-                        if(strlen(curr->word) == 0)
+                        if(curr->words->size == 0)
                         {
                             printf("%c is letter\n", curr->letter);
                         }
 
+                        // TODO: problematic area
                         Slice new_key(curr->word);
                         free(curr->word);
                         insert(new_key, curr->value, curr);
@@ -257,7 +254,7 @@ class Trie {
                 if(curr!=root && curr->is_word) {
                     int temp_len = len;
 
-                    if(strlen(curr->word) != (uint)(key.size - temp_len)) {
+                    if(curr->words->size != (uint)(key.size - temp_len)) {
 #ifdef EBUG
                         cout << "\r----------\nReturning 0 since\n(curr!=root && curr->is_word) &&\n(strlen(curr->word) != (uint)(key.size - temp_len))\n"
                             << curr->word << "(" << strlen(curr->word) << ")::" << key.size << "-" << temp_len << "\n";
@@ -265,8 +262,8 @@ class Trie {
                         return 0;
                     }
                     
-                    for(uint i=0; i<strlen(curr->word); i++) {
-                        if(key.data[temp_len + i] != curr->word[i]) {
+                    for(uint i=0; i < curr->words->size; i++) {
+                        if(key.data[temp_len + i] != curr->words->data[i]) {
 #ifdef EBUG
                         cout << "\r----------\nReturning 0 since (curr!=root && curr->is_word) && (key.data[temp_len + i] != curr->word[i])\n";
 #endif
@@ -395,7 +392,8 @@ class Trie {
          for(int i=0; i<level; i++) cout<<"\t";
             cout <<root->letter<<endl;
          for(int i=0; i<level; i++) cout<<"\t";
-            cout <<root->word<<endl;
+            root->words->print();
+            cout << endl;
         }
         else
         {
