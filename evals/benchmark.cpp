@@ -41,7 +41,7 @@ string random_value(int stringLength){
     for(char i = 'A';i<='Z';i++)letters+=i;
 
     for(int i=0;i<stringLength;i++)
-        v = v + letters[rand()%96];
+        v = v + letters[rand()%52];
 
     return v;
 }
