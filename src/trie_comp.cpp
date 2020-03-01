@@ -27,8 +27,8 @@ class Trie {
         void *arr[52];
         Slice *value;
         int children;
+        Slice *word_span;
         int left, right;  // (both inclusive)
-        Slice *curr;
     };
 
    public:
@@ -59,6 +59,11 @@ class Trie {
 
     bool insert(Slice &key, Slice &value) {
         Slice *new_key = (Slice *)malloc(sizeof(Slice));
+        new_key->size = key.size;
+        new_key->data = (char *)malloc(sizeof(char) * key.size);
+        for (int i = 0; i < key.size; i++) {
+            new_key->data[i] = key.data[i];
+        }
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
@@ -69,14 +74,36 @@ class Trie {
                 if (curr->arr[x] == NULL) {
                     TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
                     new_node->letter = key.data[len];
+                    new_node->word_span = new_key;
+                    new_node->left = len;
+                    new_node->right = key.size - 1;
                     new_node->children = 0;
                     for (int i = 0; i < 52; i++) {
                         new_node->arr[i] = NULL;
                     }
+                    new_node->value = (Slice *)malloc(sizeof(Slice));
+                    new_node->value->size = value.size;
+                    new_node->value->data =
+                        (char *)malloc(sizeof(char) * value.size);
+                    for (int j = 0; j < value.size; j++) {
+                        new_node->value->data[j] = value.data[j];
+                    }
                     curr->arr[x] = new_node;
+                    return 0;
                     // cout << &new_node << '\n';
                 }
                 curr = (TrieNode *)curr->arr[x];
+                Slice *pp = curr->word_span;
+                int iter = 0;
+                while (iter < pp->size && pp->data[iter] == key.data[len]) {
+                    len++;
+                    iter++;
+                }
+                if (iter == pp->size) {
+                    continue;
+                } else {
+                    // split here
+                }
             } else if (len == key.size) {
                 bool rv = 1;
                 if (curr->value == NULL)
@@ -91,7 +118,7 @@ class Trie {
                 // cout << curr->value.data << '\n';
                 return rv;
             }
-            len++;
+            // len++;
         }
         // return 0;
         // cur.arr['a'] = &cur;
