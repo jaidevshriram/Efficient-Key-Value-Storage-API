@@ -16,7 +16,7 @@ public:
         return db.get_val(key, value);
     }
 
-    bool put(Slice & key, Slice & value){
+    bool put(Slice &key, Slice &value){
         db.insert(key, value);
 
         /*

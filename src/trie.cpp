@@ -36,6 +36,16 @@ struct Slice {
     }
 };
 
+string sliceToStr2(Slice& a) {
+    string ret = "";
+
+    for (int i = 0; i < a.size; i++)
+        ret += a.data[i];
+
+    return ret;
+}
+
+
 class Trie {
     struct TrieNode {
         char letter;
@@ -102,7 +112,7 @@ class Trie {
                     temp[key.size - len] = '\0';
                     curr->word = temp;
                     
-                    curr->value = (Slice *)malloc(sizeof(Slice));
+                    curr->value = new Slice;
                     curr->value->size = value->size;
                     curr->value->data = (char *)malloc(sizeof(char) * value->size);
                     
@@ -135,7 +145,7 @@ class Trie {
                     cout << "NULL: Unreachable state!"<<endl;
                 }
 
-                curr->value = (Slice *)malloc(sizeof(Slice));
+                curr->value = new Slice;
                 curr->value->size = value->size;
                 curr->value->data = (char *)malloc(sizeof(char) * value->size);
                 for (int j = 0; j < value->size; j++) {
@@ -150,6 +160,7 @@ class Trie {
     void insert(Slice &key, Slice &value) {
         int len = 0;
         TrieNode *curr = root;
+        cout<<"\033[1;31m"<<sliceToStr2(key)<<" and val is \033[0m"<<sliceToStr2(value)<<endl;
         while (curr != NULL) {
             curr->children++;
             if (len < key.size) {
@@ -169,7 +180,7 @@ class Trie {
                     strncpy(temp, key.data + len, key.size - len + 1);
                     temp[key.size - len] = '\0';
                     curr->word = temp;
-                    curr->value = (Slice *)malloc(sizeof(Slice));
+                    curr->value = new Slice;
                     curr->value->size = value.size;
                     curr->value->data = (char *)malloc(sizeof(char) * value.size);
                     for (int j = 0; j < value.size; j++) {
@@ -209,11 +220,17 @@ class Trie {
                     }
                 }
             } else if (len == key.size) {
-                curr->value = (Slice *)malloc(sizeof(Slice));
+                curr->value = new Slice;
                 curr->value->size = value.size;
-                curr->value->data = (char *)malloc(sizeof(char) * value.size);
+                curr->value->data = (char *)malloc(sizeof(char) * (value.size+1));
                 for (int j = 0; j < value.size; j++) {
                     curr->value->data[j] = value.data[j];
+                    cout<<curr->value->data[j]<<":"<<j<<"  ";
+                }
+                curr->value->data[value.size] = '\0';
+                cout<<endl;
+                if(sliceToStr2(key) == "wF") {
+                    cout<<curr->value->data<<" is data in trie originally when inserted"<<endl;
                 }
                 return;           
             }
@@ -258,13 +275,19 @@ class Trie {
                     }
 
                     value.size = curr->value->size;
-                    value.data = (char *)malloc(sizeof(char) * value.size);
+                    value.data = (char *)malloc(sizeof(char) * (value.size+1));
                     for (int j = 0; j < value.size; j++) {
+#ifdef DEBUG
+                        cout<<value.data[j];
+#endif
                         value.data[j] = curr->value->data[j];
                     }
+                    value.data[value.size] = '\0';
+
 
 #ifdef EBUG
-                        cout << "\r----------\nReturning 1 since at end of (curr!=root && curr->is_word)\n";
+                    cout << "\n\r----------\nReturning 1 since at end of (curr!=root && curr->is_word)\n";
+                    cout<<"Size of value is "<<curr->value->size<<endl;
 #endif
                     return 1;
                 }
@@ -292,13 +315,17 @@ class Trie {
                     }
 
                     value.size = curr->value->size;
-                    value.data = (char *)malloc(sizeof(char) * value.size);
+                    value.data = (char *)malloc(sizeof(char) * (value.size+1));
                     for (int j = 0; j < value.size; j++) {
                         value.data[j] = curr->value->data[j];
                     }
+                    value.data[value.size] = '\0';
 
 #ifdef EBUG
-                    cout << "\r----------\nReturning 1 since (len == key.size) && (curr->value !+ NULL)\n";
+                    cout << "\n\r----------\nReturning 1 since (len == key.size) && (curr->value !+ NULL)\n";
+                    cout<<"Size of value is "<<curr->value->size<<" and "<<value.size<<endl;
+                    cout<<"Value of data in function is "<<value.data<<endl;
+                    cout<<"Value of data in trie is "<<curr->value->data<<endl;
 #endif
                     return 1;
                 }

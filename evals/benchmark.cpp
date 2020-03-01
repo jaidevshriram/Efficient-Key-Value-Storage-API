@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
@@ -148,6 +148,10 @@ int main() {
         strToSlice(key,s_key);
         strToSlice(value,s_value);
 
+        if(key == "wF") {
+            cout<<"Hallelujah "<<sliceToStr(s_value)<<endl;
+        }
+
         if(kv.get(s_key, s_value)) {
             cout << "\rFAKE GET           \n";
             exit(1);
@@ -179,8 +183,8 @@ int main() {
         int x = rand() % 2;
         if(x==0) {
             // DESCRIPTION: GET
-            // string key = random_key(rand()%64 + 1);
-            string key = random_key(64);
+            string key = random_key(rand()%64 + 1);
+            //string key = random_key(64);
             strToSlice(key,s_key);
 
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
@@ -195,6 +199,8 @@ int main() {
                 incorrect = true;
                 cout << "\rIncorrect GET for key " << key << "\nFound in kv? " << ans
                     << "\nFound in db? " << (itr != db.end()) << "\nValues equal? " << (itr->second == sliceToStr(s_value)) << endl;
+                cout << "Value in kv is "<<sliceToStr(s_value)<<" and in db is "<<itr->second<<endl;
+                cout<<"Size of val in db is "<<itr->second.size()<<endl;
             }
         } else if(x==1) {
             // DESCRIPTION: PUT
