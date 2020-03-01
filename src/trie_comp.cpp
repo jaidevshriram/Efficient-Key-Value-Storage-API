@@ -95,15 +95,76 @@ class Trie {
                 curr = (TrieNode *)curr->arr[x];
                 Slice *pp = curr->word_span;
                 int iter = 0;
-                while (iter < pp->size && pp->data[iter] == key.data[len]) {
+                while (iter < pp->size && len < key.size &&
+                       pp->data[iter] == key.data[len]) {
                     len++;
                     iter++;
                 }
-                if (iter == pp->size) {
-                    continue;
+                if (len != key.size) {
+                    if (iter == pp->size) {
+                        continue;
+                    } else {
+                        // split here
+                        // curr->word_span
+                        TrieNode *y = (TrieNode *)malloc(sizeof(TrieNode));
+                        y->value = curr->value;
+                        y->right = curr->right;
+                        y->left = iter;
+                        y->children = curr->children;
+                        y->letter = key.data[len];
+                        y->word_span = curr->word_span;
+                        for (int i = 0; i < 52; i++) {
+                            y->arr[i] = curr->arr[i];
+                        }
+                        int zzz = (key.data[len] > 90) ? key.data[len] - 97 + 26
+                                                       : key.data[len] - 65;
+                        curr->arr[zzz] = y;
+                        curr->right = iter - 1;
+                        curr->value = NULL;
+
+                        TrieNode *new_node =
+                            (TrieNode *)malloc(sizeof(TrieNode));
+                        new_node->letter = key.data[len];
+                        new_node->word_span = new_key;
+                        new_node->left = len;
+                        new_node->right = key.size - 1;
+                        new_node->children = 0;
+                        for (int i = 0; i < 52; i++) {
+                            new_node->arr[i] = NULL;
+                        }
+                        new_node->value = (Slice *)malloc(sizeof(Slice));
+                        new_node->value->size = value.size;
+                        new_node->value->data =
+                            (char *)malloc(sizeof(char) * value.size);
+                        for (int j = 0; j < value.size; j++) {
+                            new_node->value->data[j] = value.data[j];
+                        }
+                        curr->arr[x] = new_node;
+                        return 0;
+                    }
                 } else {
-                    // split here
+                    // todo
+                    if (iter == pp->size)
+                        continue;
+                    else {
+                        TrieNode *y = (TrieNode *)malloc(sizeof(TrieNode));
+                        y->value = curr->value;
+                        y->right = curr->right;
+                        y->left = iter;
+                        y->children = curr->children;
+                        y->letter = key.data[len];
+                        y->word_span = curr->word_span;
+                        for (int i = 0; i < 52; i++) {
+                            y->arr[i] = curr->arr[i];
+                        }
+                        int zzz = (key.data[len] > 90) ? key.data[len] - 97 + 26
+                                                       : key.data[len] - 65;
+                        curr->arr[zzz] = y;
+                        curr->right = iter - 1;
+                        curr->value = NULL;
+                    }
                 }
+
             } else if (len == key.size) {
                 bool rv = 1;
                 if (curr->value == NULL)
