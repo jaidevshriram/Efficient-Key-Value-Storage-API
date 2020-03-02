@@ -5,6 +5,8 @@
 #define TRIE_LIST_SIZE 0
 #define TRIE_ARRAY_SIZE 52
 
+#define SLICE_LIST_SIZE 0
+
 using namespace std;
 
 struct Slice {
@@ -64,6 +66,23 @@ class Trie {
         
         for(int i=0; i<TRIE_ARRAY_SIZE; i++)
             temp->children[i] = NULL;
+
+        return temp;
+    }
+
+    Slice* getSlice() {
+        
+        Slice *temp;
+
+        if(freeSliceList) {
+            temp = freeSliceList->node;
+            freeSliceList = freeSliceList->next;
+        } else {
+            temp = (Slice *)malloc(sizeof(Slice));
+        }
+
+        temp->size = 0;
+        temp->data = NULL;
 
         return temp;
     }
