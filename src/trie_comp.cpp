@@ -43,20 +43,20 @@ class Trie {
         root->value = NULL;
     }
 
-    void delete_recursive(TrieNode *node) {
-        if (node == NULL)
-            return;
+    // void delete_recursive(TrieNode *node) {
+    //     if (node == NULL)
+    //         return;
 
-        for (int i = 0; i < 52; i++)
-            if (node->arr[i] != NULL)
-                delete_recursive((TrieNode *)node->arr[i]);
+    //     for (int i = 0; i < 52; i++)
+    //         if (node->arr[i] != NULL)
+    //             delete_recursive((TrieNode *)node->arr[i]);
 
-        free(node);
-    }
+    //     free(node);
+    // }
 
-    ~Trie() {
-        delete_recursive(root);
-    }
+    // ~Trie() {
+    //     delete_recursive(root);
+    // }
 
     bool insert(Slice &key, Slice &value) {
         // cout << key.size << '\n';
@@ -98,7 +98,7 @@ class Trie {
                 curr = (TrieNode *)curr->arr[x];
                 Slice *pp = curr->word_span;
                 int iter = curr->left;
-                while (iter <= curr->right && len < key.size &&
+                while (iter <= curr->right && len < (int)key.size &&
                        pp->data[iter] == key.data[len]) {
                     len++;
                     iter++;
@@ -163,8 +163,9 @@ class Trie {
                         for (int i = 0; i < 52; i++) {
                             y->arr[i] = curr->arr[i];
                         }
-                        int zzz = (key.data[len] > 90) ? key.data[len] - 97 + 26
-                                                       : key.data[len] - 65;
+                        int zzz = (pp->data[iter] > 90)
+                                      ? pp->data[iter] - 97 + 26
+                                      : pp->data[iter] - 65;
                         curr->arr[zzz] = y;
                         curr->right = iter - 1;
                         curr->value = NULL;
@@ -391,64 +392,72 @@ class Trie {
 //     return value;
 // }
 
-int main(void) {
-    Trie t;
-    srand(time(NULL));
-    Slice val("ragsga");
-    {
-        Slice a("n");
-        Slice b("na");
-        Slice c("nan");
-        Slice d("nna");
-        Slice e("nanna");
-        t.insert(a, val);
-        t.insert(b, val);
-        t.insert(c, val);
-        t.insert(d, val);
-        t.insert(e, val);
-    }
-    {
-        Slice a("abcd");
-        Slice b("abd");
-        Slice c("abc");
-        t.insert(a, val);
-        t.insert(b, val);
-        t.insert(c, val);
-    }
-    // cout << a.size << '\n';
-    // Slice c("nb");
+// int main(void) {
+//     Trie t;
+//     srand(time(NULL));
+//     Slice val("ragsga");
+//     // {
+//     //     Slice a("n");
+//     //     Slice b("na");
+//     //     Slice c("nan");
+//     //     Slice d("nna");
+//     //     Slice e("nanna");
+//     //     t.insert(a, val);
+//     //     t.insert(b, val);
+//     //     t.insert(c, val);
+//     //     t.insert(d, val);
+//     //     t.insert(e, val);
+//     // }
+//     // {
+//     //     Slice a("abcd");
+//     //     Slice b("abd");
+//     //     Slice c("abc");
+//     //     t.insert(a, val);
+//     //     t.insert(b, val);
+//     //     t.insert(c, val);
+//     // }
+//     // {
+//     //     Slice a("abcd");
+//     //     Slice b("abd");
+//     //     Slice c("ab");
+//     //     t.insert(a, val);
+//     //     t.insert(b, val);
+//     //     t.insert(c, val);
+//     // }
+//     // cout << a.size << '\n';
+//     // Slice c("nb");
 
-    // t.insert(c, val);
+//     // t.insert(c, val);
 
-    t.view_all(0, t.root);
+//     t.view_all(0, t.root);
 
-    // // cout << t.del(a) << endl;
-    // // cout << t.get_val(a, val) << endl;
-    // // t.del(b);
-    // // cout<< t.get_val(b, val) <<endl;
-    // cout << t.del_N(1) << '\n';
-    // cout << t.get_val_N(1, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
-    // cout << t.get_val_N(2, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
-    // cout << t.get_val_N(3, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
-    // cout << t.get_val_N(4, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
-    // cout << t.get_val_N(5, a, val) << '\n';
-    // cout << a.data << '\n';
-    // cout << val.data << '\n';
+//     // // cout << t.del(a) << endl;
+//     // // cout << t.get_val(a, val) << endl;
+//     // // t.del(b);
+//     // // cout<< t.get_val(b, val) <<endl;
+//     // cout << t.del_N(1) << '\n';
+//     // cout << t.get_val_N(1, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
+//     // cout << t.get_val_N(2, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
+//     // cout << t.get_val_N(3, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
+//     // cout << t.get_val_N(4, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
+//     // cout << t.get_val_N(5, a, val) << '\n';
+//     // cout << a.data << '\n';
+//     // cout << val.data << '\n';
 
-    // for (int i = 0; i < 10000; i++) {
-    //     Slice s1 = random_key(rand() % 64 + 1);
-    //     Slice s2 = random_key(rand() % 256 + 1);
-    //     t.insert(s1, s2);
-    // }
+//     // for (int i = 0; i < 10000; i++) {
+//     //     Slice s1 = random_key(rand() % 64 + 1);
+//     //     Slice s2 = random_key(rand() % 256 + 1);
+//     //     t.insert(s1, s2);
+//     // }
 
-    // cout << t.count_ptr(t.root) << " " << t.root->children << '\n';
-    return 0;
-}
+//     // cout << t.count_ptr(t.root) << " " << t.root->children << '\n';
+//     return 0;
+// }
