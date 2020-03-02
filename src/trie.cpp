@@ -2,7 +2,7 @@
 #include <map>
 #include <bits/stdc++.h>
 
-#define TRIE_LIST_SIZE 0
+#define TRIE_LIST_SIZE 8000000
 #define TRIE_ARRAY_SIZE 52
 
 #define SLICE_LIST_SIZE 0
@@ -19,11 +19,6 @@ struct Slice {
     }
 };
 
-struct SliceNodeBlock {
-    SliceNodeBlock *next;
-    Slice *node;
-};
-
 struct TrieNode {
     int childrenCount;
     int wordsBelow;
@@ -32,26 +27,21 @@ struct TrieNode {
     TrieNode* children[TRIE_ARRAY_SIZE];
 };
 
-struct TrieNodeBlock {
-    TrieNodeBlock *next;
-    TrieNode *node;
-};
-
 class Trie {
 
    public:
     
     TrieNode *root;
-    TrieNodeBlock *freeTrieList;
-    SliceNodeBlock *freeSliceList;
+    TrieNode *freeTrieList;
+    Slice *freeSliceList;
 
     TrieNode* getTrieNode() {
         
         TrieNode *temp;
 
         if(freeTrieList) {
-            temp = freeTrieList->node;
-            freeTrieList = freeTrieList->next;
+            temp = freeTrieList;
+            freeTrieList = (TrieNode *) freeTrieList->word;
         } else {
 #ifdef EBUG
             cout<<"Empty List\n";
@@ -64,10 +54,15 @@ class Trie {
         temp->word = NULL;
         temp->value = NULL;
         
-        for(int i=0; i<TRIE_ARRAY_SIZE; i++)
+        for(register int i=0; i<TRIE_ARRAY_SIZE; i++)
             temp->children[i] = NULL;
 
         return temp;
+    }
+
+    void freeTrieNode(TrieNode *node) {
+        node->word = (char *) freeTrieList;
+        freeTrieList = node;
     }
 
     Slice* getSlice() {
@@ -75,8 +70,8 @@ class Trie {
         Slice *temp;
 
         if(freeSliceList) {
-            temp = freeSliceList->node;
-            freeSliceList = freeSliceList->next;
+            temp = freeSliceList;
+            freeSliceList = (Slice *) freeSliceList->data;
         } else {
             temp = (Slice *)malloc(sizeof(Slice));
         }
@@ -88,59 +83,56 @@ class Trie {
     }
 
     Trie() {
+
+        root = NULL;
         
         // Initialize the TrieNodeBlock (the list of memory blocks)
-        freeTrieList = (TrieNodeBlock *)malloc(sizeof(TrieNodeBlock));
-        freeTrieList->next = NULL;
-        freeTrieList->node = (TrieNode *)malloc(sizeof(TrieNode));
+        freeTrieList = (TrieNode *)malloc(sizeof(TrieNode));
+        freeTrieList->word = NULL;
 
         // Generate the entire free list
         for(int i=0; i<TRIE_LIST_SIZE; i++) {
-            TrieNodeBlock *temp = (TrieNodeBlock *)malloc(sizeof(TrieNode));
-            
-            temp->next = freeTrieList;
-            temp->node = (TrieNode *)malloc(sizeof(TrieNode));
-            
+            TrieNode *temp = (TrieNode *)malloc(sizeof(TrieNode));
+            temp->word = (char *) freeTrieList;
             freeTrieList = temp;
         }
-
-        freeSliceList = (SliceNodeBlock *)malloc(sizeof(SliceNodeBlock));
-        freeSliceList->next = NULL;
-        freeSliceList->node = (Slice *)malloc(sizeof(Slice));
+    
+        freeSliceList = (Slice *)malloc(sizeof(Slice));
+        freeSliceList->data = NULL;
 
         for(int i=0; i<SLICE_LIST_SIZE; i++) {
-            SliceNodeBlock *temp = (SliceNodeBlock *)malloc(sizeof(SliceNodeBlock));
-            
-            temp->next = freeSliceList;
-            temp->node = (Slice *)malloc(sizeof(Slice));
-
+            Slice *temp = (Slice *)malloc(sizeof(Slice));
+            temp->data = (char *) freeSliceList;
             freeSliceList = temp;
         }
-    }
+
+   }
 
 
     ~Trie() {
 
-        for(TrieNodeBlock *block = freeTrieList; block!=NULL; ) {
-            TrieNodeBlock *temp = block;
-            block = block->next;
-            free(temp->node);
+        for(TrieNode *block = freeTrieList; block!=NULL; ) {
+            TrieNode *temp = block;
+            block = (TrieNode *) block->word;
             free(temp);
         }
 
-        for(SliceNodeBlock *block = freeSliceList; block!=NULL; ) {
-            SliceNodeBlock *temp = block;
-            block = block->next;
-            free(temp->node);
+        int i=0;
+        for(Slice *block = freeSliceList; block!=NULL; ) {
+            Slice *temp = block;
+            block = (Slice *) block->data;
             free(temp);
         }
         
+        if(root!=NULL)
+            free(root);
     }
 
     void test_list() {
         TrieNode *test = getTrieNode();
+        //Slice *test = getSlice();
         if(test==NULL)
-            printf("ERROR\n");
+            printf("\rERROR\n");
     }
 
 };
@@ -151,9 +143,7 @@ int main(void) {
      
     long double total = 0;
 
-    cout<<sizeof(TrieNodeBlock)<<" and  "<<sizeof(TrieNode)<<endl;
-
-    for(int i=0; i<8000000; i++) {
+    for(int i=0; i<8000005; i++) {
         struct timespec ts;
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
         long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
