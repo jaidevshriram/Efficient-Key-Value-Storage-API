@@ -1,37 +1,42 @@
 #include <bits/stdc++.h>
-#include "../src/trie_ll.cpp"
+#include "../src/trie_comp.cpp"
 using namespace std;
 
-class kvstore {
+class kvStore {
+    uint64_t maxSize;
+
    public:
+    kvStore(uint64_t maxSize) {
+        this->maxSize = maxSize;
+    }
+
     Trie db;
 
-    bool get(string key) {
-        Slice a(key), b;
-        bool is_valid = db.get_val(a, b);
-        return is_valid;
+    bool get(Slice &key, Slice &value) {
+        return db.get_val(key, value);
     }
 
-    bool put(string key, string value) {
-        Slice a(key), b(value);
-        return db.insert(a, b);
-        // return true;
+    bool put(Slice &key, Slice &value) {
+        db.insert(key, value);
+
+        /*
+         * TODO
+         * insert doesn't replace old values
+         */
+        return true;
     }
 
-    bool del(string key) {
-        Slice a(key);
-        bool is_valid = true;  // db.del(a);
-        return is_valid;
+    bool del(Slice &key) {
+        return db.del(key);
     }
 
-    pair<string, string> get(int N) {
-        // Your Code Here
-        pair<string, string> temp = make_pair("key", "value");
-        return temp;
+    bool get(int N, Slice &key, Slice &value) {
+        // TODO: implement this
+        return true;
     }
 
     bool del(int N) {
-        // Your Code Here
+        // TODO: implement this
         return true;
     }
 };
