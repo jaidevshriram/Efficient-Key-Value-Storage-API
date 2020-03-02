@@ -63,8 +63,49 @@ class Trie {
     //     delete_recursive(root);
     // }
 
+    bool red_children(Slice &key) {
+        // cout << key.data << '\n';
+        Slice *new_key = (Slice *)malloc(sizeof(Slice));
+        new_key->size = key.size;
+        new_key->data = (char *)malloc(sizeof(char) * key.size);
+        for (int i = 0; i < key.size; i++) {
+            new_key->data[i] = key.data[i];
+        }
+        int len = 0;
+        TrieNode *curr = root;
+        while (curr != NULL) {
+            curr->children--;
+            if (len < key.size) {
+                int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
+                                             : key.data[len] - 65;
+                curr = (TrieNode *)curr->arr[x];
+                Slice *pp = curr->word_span;
+                int iter = curr->left;
+                while (iter <= curr->right && len < (int)key.size &&
+                       pp->data[iter] == key.data[len]) {
+                    len++;
+                    iter++;
+                }
+                if (len != key.size) {
+                    if (iter == curr->right + 1) {
+                        continue;
+                    }
+                } else {
+                    if (iter == curr->right + 1)
+                        continue;
+                }
+
+            } else if (len == key.size) {
+                return 1;
+            }
+            // len++;
+        }
+        // return 0;
+        // cur.arr['a'] = &cur;
+    }
+
     bool insert(Slice &key, Slice &value) {
-        cout << key.data << '\n';
+        // cout << key.data << '\n';
         Slice *new_key = (Slice *)malloc(sizeof(Slice));
         new_key->size = key.size;
         new_key->data = (char *)malloc(sizeof(char) * key.size);
@@ -106,17 +147,19 @@ class Trie {
                     len++;
                     iter++;
                 }
-                if (len != key.size) {
+                if (len != (int)key.size) {
                     if (iter == curr->right + 1) {
                         continue;
                     } else {
                         // split here
+                        // cout << key.data << " yo im " << '\n';
+                        // view_all(0, root);
                         TrieNode *y = (TrieNode *)malloc(sizeof(TrieNode));
                         y->value = curr->value;
                         y->right = curr->right;
                         y->left = iter;
                         y->children = curr->children;
-                        y->letter = key.data[len];
+                        y->letter = pp->data[iter];
                         y->word_span = curr->word_span;
                         for (int i = 0; i < 52; i++) {
                             y->arr[i] = curr->arr[i];
@@ -124,11 +167,15 @@ class Trie {
                         int zzz = (pp->data[iter] > 90)
                                       ? pp->data[iter] - 97 + 26
                                       : pp->data[iter] - 65;
+                        for (int i = 0; i < 52; i++) {
+                            curr->arr[i] = NULL;
+                        }
                         curr->arr[zzz] = y;
                         curr->right = iter - 1;
                         curr->value = NULL;
                         curr->children++;
 
+                        // view_all(0, root);
                         TrieNode *new_node =
                             (TrieNode *)malloc(sizeof(TrieNode));
                         new_node->letter = key.data[len];
@@ -168,6 +215,9 @@ class Trie {
                         int zzz = (pp->data[iter] > 90)
                                       ? pp->data[iter] - 97 + 26
                                       : pp->data[iter] - 65;
+                        for (int i = 0; i < 52; i++) {
+                            curr->arr[i] = NULL;
+                        }
                         curr->arr[zzz] = y;
                         curr->right = iter - 1;
                         // curr->children++;
@@ -186,6 +236,8 @@ class Trie {
                 for (int j = 0; j < value.size; j++) {
                     curr->value->data[j] = value.data[j];
                 }
+                if (rv == 1)
+                    red_children(key);
                 // cout << curr->value.data << '\n';
                 return rv;
             }
@@ -431,7 +483,6 @@ class Trie {
     }
 };
 
-// #ifdef BENCH
 // int main(void) {
 //     Trie t;
 //     srand(time(NULL));
@@ -484,7 +535,7 @@ class Trie {
 //     //     t.view_all(0, t.root);
 //     // }
 //     // {
-//     //     Slice a("abc");
+//     //     Slice a("a");
 //     //     Slice b("a");
 //     //     Slice c("c");
 //     //     Slice d("bb");
@@ -494,6 +545,10 @@ class Trie {
 //     //     t.insert(c, val);
 //     //     t.insert(d, val);
 //     //     t.insert(e, val);
+//     //     t.view_all(0, t.root);
+//     //     cout << t.get_val_N(0, a, val) << '\n';
+//     //     cout << a.data << '\n';
+//     //     cout << val.data << '\n';
 //     //     cout << t.get_val_N(1, a, val) << '\n';
 //     //     cout << a.data << '\n';
 //     //     cout << val.data << '\n';
@@ -503,32 +558,124 @@ class Trie {
 //     //     cout << t.get_val_N(3, a, val) << '\n';
 //     //     cout << a.data << '\n';
 //     //     cout << val.data << '\n';
-//     //     cout << t.get_val_N(4, a, val) << '\n';
-//     //     cout << a.data << '\n';
-//     //     cout << val.data << '\n';
-//     //     cout << t.get_val_N(5, a, val) << '\n';
-//     //     cout << a.data << '\n';
-//     //     cout << val.data << '\n';
+//     //     // cout << t.get_val_N(4, a, val) << '\n';
+//     //     // cout << a.data << '\n';
+//     //     // cout << val.data << '\n';
 //     // }
 //     {
 //         Slice ddd;
-//         ddd = Slice("wLRbBMqbHcdARZoWkKyhidDQscdxRjMowfRXSJYbQ");
+//         ddd = Slice("wL");
 //         t.insert(ddd, val);
-//         ddd = Slice("CSgsPqOQMQXNzlGdGwPbtrw");
+//         ddd = Slice("u");
 //         t.insert(ddd, val);
-//         ddd = Slice("yxHOAchwDvmXxRdryxlmNDqtUKwaGMLejUuKWCIbXUBuMEnMEyATD");
+//         ddd = Slice("lm");
 //         t.insert(ddd, val);
-//         ddd = Slice("UYoyPAyuLyeIMuOTehzriIcFsKPGgKbbI");
+//         ddd = Slice("Zr");
 //         t.insert(ddd, val);
-//         ddd = Slice("wUzIfwovYDdwYvVbURCZMGYjgFDxvtnunNEsLSplwUIupfXLzbK");
+//         ddd = Slice("sI");
 //         t.insert(ddd, val);
-//         ddd = Slice("JObMSkSKfojNewXGXnNOFwLTwJwnNvbwjcKDmeoUU");
+//         ddd = Slice("QvD");
 //         t.insert(ddd, val);
-//         ddd = Slice("dZnCqGjlApoPKvXfgVICEtCMKBljOPgtqVVHBGSDVIVheSn");
+//         ddd = Slice("gV");
 //         t.insert(ddd, val);
-//         cout << t.get_val_N(1, ddd, val) << '\n';
+//         ddd = Slice("cXd");
+//         t.insert(ddd, val);
+//         ddd = Slice("k");
+//         t.insert(ddd, val);
+//         ddd = Slice("J");
+//         t.insert(ddd, val);
+//         ddd = Slice("faM");
+//         t.insert(ddd, val);
+//         ddd = Slice("W");
+//         t.insert(ddd, val);
+//         ddd = Slice("z");
+//         t.insert(ddd, val);
+//         ddd = Slice("qxs");
+//         t.insert(ddd, val);
+//         ddd = Slice("IK");
+//         t.insert(ddd, val);
+//         ddd = Slice("Mj");
+//         t.insert(ddd, val);
+//         ddd = Slice("Sok");
+//         t.insert(ddd, val);
+//         ddd = Slice("e");
+//         t.insert(ddd, val);
+//         ddd = Slice("tE");
+//         t.insert(ddd, val);
+//         ddd = Slice("WX");
+//         t.insert(ddd, val);
+//         ddd = Slice("E");
+//         t.insert(ddd, val);
+//         ddd = Slice("xY");
+//         t.insert(ddd, val);
+//         ddd = Slice("QD");
+//         t.insert(ddd, val);
+//         ddd = Slice("IF");
+//         t.insert(ddd, val);
+//         ddd = Slice("Omw");
+//         t.insert(ddd, val);
+//         ddd = Slice("mvv");
+//         t.insert(ddd, val);
+//         ddd = Slice("omF");
+//         t.insert(ddd, val);
+//         ddd = Slice("t");
+//         t.insert(ddd, val);
+//         ddd = Slice("qx");
+//         t.insert(ddd, val);
+//         ddd = Slice("Tae");
+//         t.insert(ddd, val);
+//         ddd = Slice("Oo");
+//         t.insert(ddd, val);
+//         ddd = Slice("H");
+//         t.insert(ddd, val);
+//         ddd = Slice("g");
+//         t.insert(ddd, val);
+//         ddd = Slice("qhw");
+//         t.insert(ddd, val);
+//         ddd = Slice("gDF");
+//         t.insert(ddd, val);
+//         ddd = Slice("QJ");
+//         t.insert(ddd, val);
+//         ddd = Slice("I");
+//         t.insert(ddd, val);
+//         ddd = Slice("D");
+//         t.insert(ddd, val);
+//         cout << t.get_val_N(29, ddd, val) << '\n';
 //         cout << ddd.data << '\n';
+//         t.view_all(0, t.root);
 //     }
+//     // {
+//     //     Slice ddd;
+//     //     ddd = Slice("qxs");
+//     //     t.insert(ddd, val);
+//     //     ddd = Slice("qx");
+//     //     t.insert(ddd, val);
+//     //     // t.view_all(0, t.root);
+//     //     ddd = Slice("qhw");
+//     //     t.insert(ddd, val);
+//     //     t.view_all(0, t.root);
+//     // }
+//     // {
+//     //     Slice ddd;
+//     //     ddd = Slice("wLRbBMqbHcdARZoWkKyhidDQscdxRjMowfRXSJYbQ");
+//     //     t.insert(ddd, val);
+//     //     ddd = Slice("CSgsPqOQMQXNzlGdGwPbtrw");
+//     //     t.insert(ddd, val);
+//     //     ddd =
+//     Slice("yxHOAchwDvmXxRdryxlmNDqtUKwaGMLejUuKWCIbXUBuMEnMEyATD");
+//     //     t.insert(ddd, val);
+//     //     ddd = Slice("UYoyPAyuLyeIMuOTehzriIcFsKPGgKbbI");
+//     //     t.insert(ddd, val);
+//     //     ddd =
+//     Slice("wUzIfwovYDdwYvVbURCZMGYjgFDxvtnunNEsLSplwUIupfXLzbK");
+//     //     t.insert(ddd, val);
+//     //     ddd = Slice("JObMSkSKfojNewXGXnNOFwLTwJwnNvbwjcKDmeoUU");
+//     //     t.insert(ddd, val);
+//     //     ddd = Slice("dZnCqGjlApoPKvXfgVICEtCMKBljOPgtqVVHBGSDVIVheSn");
+//     //     t.insert(ddd, val);
+//     //     cout << t.get_val_N(1, ddd, val) << '\n';
+//     //     cout << ddd.data << '\n';
+//     // }
 //     // for (int i = 0; i < 10000; i++) {
 //     //     Slice s1 = random_key(rand() % 64 + 1);
 //     //     Slice s2 = random_key(rand() % 256 + 1);

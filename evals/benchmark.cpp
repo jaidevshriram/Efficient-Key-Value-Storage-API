@@ -50,8 +50,9 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 10000, NUM_OPS = 10000;
+const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 100000;
 const long CLOCKS_PER_SECOND = 1000000;
+const uint key_size = 64, val_size = 255;
 
 kvStore kv(MAX_KEYS);
 
@@ -80,14 +81,14 @@ uint OPS_COUNTER = 0;
 // 			int x = rand()%5;
 // 			if(x==0)
 // 			{
-// 				string key = random_key(rand()%64 + 1);
+// 				string key = random_key(rand()%key_size + 1);
 // 				Slice s_key,s_value;
 // 				strToSlice(key,s_key);
 // 				bool ans = kv.get(s_key,s_value);
 // 			}
 // 			else if(x==1)
 // 			{
-// 				string key = random_key(rand()%64 + 1);
+// 				string key = random_key(rand()%key_size + 1);
 // 				string value = random_value(rand()%255 + 1);
 // 				Slice s_key,s_value,temp;
 // 				strToSlice(key,s_key);
@@ -142,10 +143,10 @@ int main() {
     long double total = 0;
 
     for (int i = 0; i < INSERTS; i++) {
-        string key = random_key(rand() % 64 + 1);
+        string key = random_key(rand() % key_size + 1);
 
         while (db.find(key) != db.end())
-            key = random_key(rand() % 64 + 1);
+            key = random_key(rand() % key_size + 1);
 
         string value = random_value(rand() % 255 + 1);
         db[key] = value;
@@ -170,10 +171,10 @@ int main() {
         }
 
         db_size = db.size();
-        // printf("\r%8d", i);
+        printf("\r%8d", i);
     }
 
-    // printf("\rInsertion of %u values took %Lfs\n", INSERTS, total);
+    printf("\rInsertion of %u values took %Lfs\n", INSERTS, total);
 
     total = 0;
 
@@ -183,8 +184,8 @@ int main() {
         int x = rand() % 4;
         if (x == 0) {
             // DESCRIPTION: GET
-            string key = random_key(rand() % 64 + 1);
-            // string key = random_key(64);
+            string key = random_key(rand() % key_size + 1);
+            // string key = random_key(key_size);
             strToSlice(key, s_key);
 
             // printf("GET OP: %s\n", key);
@@ -209,7 +210,7 @@ int main() {
             }
         } else if (x == 1) {
             // DESCRIPTION: PUT
-            int k = rand() % 64 + 1;
+            int k = rand() % key_size + 1;
             int v = rand() % 255 + 1;
             string key = random_key(k);
             string value = random_value(v);
@@ -243,7 +244,7 @@ int main() {
             OPS_COUNTER--;
             continue;
             // DESCRIPTION: DELETE
-            int rem = rand() % db_size;
+            int rem = rand() % db.size();
             map<string, string>::iterator itr = db.begin();
             advance(itr, rem);
             string key = itr->first;
@@ -317,7 +318,7 @@ int main() {
             }
         }
 
-        // cout << "\r" << i;
+        cout << "\r" << i;
 
         if (incorrect == true) {
             cout << "\rError in operation " << DESCRIPTION[x] << "\n Completed "
