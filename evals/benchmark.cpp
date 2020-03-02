@@ -36,10 +36,10 @@ string random_key(int stringLength){
 string random_value(int stringLength){
     string v = "";
     string letters = "";
-    for(int i = 32;i<127;i++)letters+=char(i);
+    for(int i = 'A';i<'Z';i++)letters+=char(i);
 
     for(int i=0;i<stringLength;i++)
-        v = v + letters[rand()%96];
+        v = v + letters[rand()%26];
 
     return v;
 }
@@ -148,10 +148,6 @@ int main() {
         strToSlice(key,s_key);
         strToSlice(value,s_value);
 
-        if(key == "wF") {
-            cout<<"Hallelujah "<<sliceToStr(s_value)<<endl;
-        }
-
         if(kv.get(s_key, s_value)) {
             cout << "\rFAKE GET           \n";
             exit(1);
@@ -187,6 +183,7 @@ int main() {
             //string key = random_key(64);
             strToSlice(key,s_key);
 
+            printf("GET OP: %s\n", key);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool ans = kv.get(s_key,s_value);
@@ -209,6 +206,7 @@ int main() {
             string key = random_key(k);
             string value = random_value(v);
             db[key] = value;
+            printf("PUT OP: %s with val %s", key, value);
             strToSlice(key,s_key);
             strToSlice(value,s_value);
 
