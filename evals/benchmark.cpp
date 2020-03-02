@@ -50,7 +50,7 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 100000;
+const uint MAX_KEYS = 10000000, INSERTS = 1000000, NUM_OPS = 10000;
 const long CLOCKS_PER_SECOND = 1000000;
 
 kvStore kv(MAX_KEYS);
@@ -180,14 +180,14 @@ int main() {
     bool incorrect = false;
 
     for (int i = 0; i < NUM_OPS; i++, OPS_COUNTER++) {
-        int x = rand() % 2;
+        int x = rand() % 3;
         if (x == 0) {
             // DESCRIPTION: GET
             string key = random_key(rand() % 64 + 1);
             // string key = random_key(64);
             strToSlice(key, s_key);
 
-            printf("GET OP: %s\n", key);
+            // printf("GET OP: %s\n", key);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool ans = kv.get(s_key, s_value);
@@ -214,7 +214,7 @@ int main() {
             string key = random_key(k);
             string value = random_value(v);
             db[key] = value;
-            printf("PUT OP: %s with val %s", key, value);
+            // printf("PUT OP: %s with val %s\n", key, value);
             strToSlice(key, s_key);
             strToSlice(value, s_value);
 
@@ -234,7 +234,7 @@ int main() {
              * currently, put returns true always
              * if(check2 == false || value != sliceToStr(check))
              */
-            if (false && (check2 == false || value != sliceToStr(check))) {
+            if (check2 == false || value != sliceToStr(check)) {
                 incorrect = true;
                 // TODO
                 cout << "\rSome error with put, will check later" << endl;
@@ -251,6 +251,7 @@ int main() {
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool check = kv.del(s_key);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            // printf("DEL OP\n");
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
 
