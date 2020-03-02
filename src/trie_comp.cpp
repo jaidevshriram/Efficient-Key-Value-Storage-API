@@ -25,8 +25,6 @@ struct Slice {
 };
 
 class Trie {
-    Slice *keys = NULL;
-    int num;
     struct TrieNode {
         char letter;
         // map<char, void *> mp;
@@ -243,7 +241,8 @@ class Trie {
             }
             // len++;
         }
-        // return 0;
+        cout << "UNREACHABLE\n";
+        return 0;
         // cur.arr['a'] = &cur;
     }
 
@@ -292,16 +291,18 @@ class Trie {
                 }
             }
         }
+
+        cout << "UNREACHABLE\n";
+        return 0;
     }
 
     bool del(Slice &key) {
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
-            curr->children++;
             if (len < key.size) {
-                int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
-                                             : key.data[len] - 65;
+                int x = (key.data[len] >= 'a') ? key.data[len] - 'a' + 26
+                                             : key.data[len] - 'A';
                 if (curr->arr[x] == NULL) {
                     return 0;
                 }
