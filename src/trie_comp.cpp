@@ -3,6 +3,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// void *makeTrieNode() {
+//     p = malloc();
+//     p->
+// }
+
 struct Slice {
    public:
     uint8_t size;
@@ -59,7 +64,7 @@ class Trie {
     // }
 
     bool insert(Slice &key, Slice &value) {
-        // cout << key.size << '\n';
+        // cout << key.data << " pop " << '\n';
         Slice *new_key = (Slice *)malloc(sizeof(Slice));
         new_key->size = key.size;
         new_key->data = (char *)malloc(sizeof(char) * key.size);
@@ -158,7 +163,7 @@ class Trie {
                         y->right = curr->right;
                         y->left = iter;
                         y->children = curr->children;
-                        y->letter = key.data[len];
+                        y->letter = pp->data[iter];
                         y->word_span = curr->word_span;
                         for (int i = 0; i < 52; i++) {
                             y->arr[i] = curr->arr[i];
@@ -196,12 +201,36 @@ class Trie {
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
+            curr->children++;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
-                if (curr->arr[x] == NULL)
+                if (curr->arr[x] == NULL) {
                     return 0;
+                }
                 curr = (TrieNode *)curr->arr[x];
+                Slice *pp = curr->word_span;
+                int iter = curr->left;
+                while (iter <= curr->right && len < (int)key.size &&
+                       pp->data[iter] == key.data[len]) {
+                    len++;
+                    iter++;
+                }
+                if (len != key.size) {
+                    if (iter == curr->right + 1) {
+                        continue;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    // todo
+                    if (iter == curr->right + 1)
+                        continue;
+                    else {
+                        return 0;
+                    }
+                }
+
             } else if (len == key.size) {
                 if (curr->value == NULL)
                     return 0;
@@ -214,8 +243,31 @@ class Trie {
                     return 1;
                 }
             }
-            len++;
+            // len++;
         }
+        // int len = 0;
+        // TrieNode *curr = root;
+        // while (curr != NULL) {
+        //     if (len < key.size) {
+        //         int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
+        //                                      : key.data[len] - 65;
+        //         if (curr->arr[x] == NULL)
+        //             return 0;
+        //         curr = (TrieNode *)curr->arr[x];
+        //     } else if (len == key.size) {
+        //         if (curr->value == NULL)
+        //             return 0;
+        //         else {
+        //             value.size = curr->value->size;
+        //             value.data = (char *)malloc(sizeof(char) * value.size);
+        //             for (int j = 0; j < value.size; j++) {
+        //                 value.data[j] = curr->value->data[j];
+        //             }
+        //             return 1;
+        //         }
+        //     }
+        //     len++;
+        // }
         // cur.arr['a'] = &cur;
         // cout << endl;
     }
@@ -359,55 +411,38 @@ class Trie {
     }
 };
 
-// int main(void) {
-//     Trie t;
-//     Slice a("ZT");
-//     Slice b("T");
-//     cout << t.insert(a, b);
-//     return 0;
-// }
-
-// string random_key(int stringLength) {
-//     string key = "";
-//     string letters = "";
-//     for (char i = 'a'; i <= 'z'; i++)
-//         letters += i;
-//     for (char i = 'A'; i <= 'Z'; i++)
-//         letters += i;
-//     for (int i = 0; i < stringLength; i++)
-//         key = key + letters[rand() % 52];
-
-//     return key;
-// }
-
-// string random_value(int stringLength) {
-//     string value = "";
-//     string letters = "";
-//     for (int i = 0; i <= 255; i++)
-//         letters += char(i);
-
-//     for (int i = 0; i < stringLength; i++)
-//         value = value + letters[rand() % 256];
-
-//     return value;
-// }
-
+// #ifdef BENCH
 // int main(void) {
 //     Trie t;
 //     srand(time(NULL));
 //     Slice val("ragsga");
-//     // {
-//     //     Slice a("n");
-//     //     Slice b("na");
-//     //     Slice c("nan");
-//     //     Slice d("nna");
-//     //     Slice e("nanna");
-//     //     t.insert(a, val);
-//     //     t.insert(b, val);
-//     //     t.insert(c, val);
-//     //     t.insert(d, val);
-//     //     t.insert(e, val);
-//     // }
+//     Slice val2("");
+//     {
+//         Slice a("n");
+//         Slice b("na");
+//         Slice c("nan");
+//         Slice d("nna");
+//         Slice e("nanna");
+//         t.insert(a, val);
+//         t.insert(b, val);
+//         t.insert(c, val);
+//         t.insert(d, val);
+//         t.insert(e, val);
+
+//         // t.view_all(0, t.root);
+//         Slice vala("");
+//         cout << t.get_val(a, vala) << '\n';
+//         printf("%.*s\n", vala.size, vala.data);
+//         Slice valb("");
+//         cout << t.get_val(b, valb) << '\n';
+//         // cout << valb.data << '\n';
+//         Slice valc("");
+//         cout << t.get_val(c, valc) << '\n';
+//         // cout << valc.data << '\n';
+//         Slice val4("");
+//         cout << t.get_val(vala, valb) << '\n';
+//         cout << t.get_val(val4, valb) << '\n';
+//     }
 //     // {
 //     //     Slice a("abcd");
 //     //     Slice b("abd");
@@ -415,6 +450,7 @@ class Trie {
 //     //     t.insert(a, val);
 //     //     t.insert(b, val);
 //     //     t.insert(c, val);
+//     // t.view_all(0, t.root);
 //     // }
 //     // {
 //     //     Slice a("abcd");
@@ -423,13 +459,12 @@ class Trie {
 //     //     t.insert(a, val);
 //     //     t.insert(b, val);
 //     //     t.insert(c, val);
+//     // t.view_all(0, t.root);
 //     // }
 //     // cout << a.size << '\n';
 //     // Slice c("nb");
 
 //     // t.insert(c, val);
-
-//     t.view_all(0, t.root);
 
 //     // // cout << t.del(a) << endl;
 //     // // cout << t.get_val(a, val) << endl;
