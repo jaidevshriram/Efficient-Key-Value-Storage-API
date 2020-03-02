@@ -50,7 +50,7 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 1000000, NUM_OPS = 10000;
+const uint MAX_KEYS = 10000000, INSERTS = 10000, NUM_OPS = 10000;
 const long CLOCKS_PER_SECOND = 1000000;
 
 kvStore kv(MAX_KEYS);
@@ -170,17 +170,17 @@ int main() {
         }
 
         db_size = db.size();
-        printf("\r%8d", i);
+        // printf("\r%8d", i);
     }
 
-    printf("\rInsertion of %u values took %Lfs\n", INSERTS, total);
+    // printf("\rInsertion of %u values took %Lfs\n", INSERTS, total);
 
     total = 0;
 
     bool incorrect = false;
 
     for (int i = 0; i < NUM_OPS; i++, OPS_COUNTER++) {
-        int x = rand() % 3;
+        int x = rand() % 4;
         if (x == 0) {
             // DESCRIPTION: GET
             string key = random_key(rand() % 64 + 1);
@@ -240,6 +240,8 @@ int main() {
                 cout << "\rSome error with put, will check later" << endl;
             }
         } else if (x == 2) {
+            OPS_COUNTER--;
+            continue;
             // DESCRIPTION: DELETE
             int rem = rand() % db_size;
             map<string, string>::iterator itr = db.begin();
@@ -282,9 +284,12 @@ int main() {
             if (itr->first != sliceToStr(s_key) ||
                 itr->second != sliceToStr(s_value)) {
                 incorrect = true;
+                cout << "N: " << rem << '\n';
                 cout << "\rget(n)\nkeys same? "
                      << (itr->first == sliceToStr(s_key)) << "\nvalues same? "
                      << (itr->second == sliceToStr(s_value)) << endl;
+                cout << "Key: Supposed to be " << itr->first << "\n Found "
+                     << sliceToStr(s_key) << '\n';
             }
         } else if (x == 4) {
             // DESCRIPTION: DELETE N
@@ -312,7 +317,7 @@ int main() {
             }
         }
 
-        cout << "\r" << i;
+        // cout << "\r" << i;
 
         if (incorrect == true) {
             cout << "\rError in operation " << DESCRIPTION[x] << "\n Completed "

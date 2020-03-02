@@ -31,6 +31,7 @@ class kvStore {
     }
 
     bool get(int N, Slice &key, Slice &value) {
+        db.get_val_N(N, key, value);
         // TODO: implement this
         return true;
     }
