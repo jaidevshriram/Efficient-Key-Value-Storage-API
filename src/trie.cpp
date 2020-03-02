@@ -19,8 +19,8 @@ struct Slice {
     }
 };
 
-struct SlideNodeBlock {
-    SlideNodeBlock *next;
+struct SliceNodeBlock {
+    SliceNodeBlock *next;
     Slice *node;
 };
 
@@ -43,7 +43,7 @@ class Trie {
     
     TrieNode *root;
     TrieNodeBlock *freeTrieList;
-    Slice *freeSliceList;
+    SliceNodeBlock *freeSliceList;
 
     TrieNode* getTrieNode() {
         
@@ -104,7 +104,7 @@ class Trie {
             freeTrieList = temp;
         }
 
-        freeSliceList = (SlideNodeBlock *)malloc(sizeof(SliceNodeBlock));
+        freeSliceList = (SliceNodeBlock *)malloc(sizeof(SliceNodeBlock));
         freeSliceList->next = NULL;
         freeSliceList->node = (Slice *)malloc(sizeof(Slice));
 
@@ -112,7 +112,7 @@ class Trie {
             SliceNodeBlock *temp = (SliceNodeBlock *)malloc(sizeof(SliceNodeBlock));
             
             temp->next = freeSliceList;
-            temp->node = (Slicce *)malloc(sizeof(Slice));
+            temp->node = (Slice *)malloc(sizeof(Slice));
 
             freeSliceList = temp;
         }
