@@ -88,7 +88,7 @@ void *myThreadFun(void *vargp) {
 int main() {
     srand(time(0));
     long double total = 0;
-    int n = 1000000;
+    int n = 100000;
     for (int i = 0; i < n; i++) {
         int k = rand() % 64 + 1;
         int v = rand() % 256 + 1;
@@ -105,32 +105,32 @@ int main() {
         printf("%7d\r", i);
     }
     cout << total << '\n';
-    return 0;
+    // return 0;
     struct timespec start, end;
     double time = 0, t;
-    for (int i = 0; i < n; i++) {
-        int k = rand() % 64 + 1;
-        int v = rand() % 256 + 1;
-        string key = random_key(k);
-        string value = random_value(v);
-        struct timespec ts;
-        // bool check1 = kv.get(key);
-        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-        long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
-        // bool check1 = kv.get(key);
-        bool ans = kv.put(key, value);
-        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-        long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
-        time += (en - st);
-        printf("%7d\r", i);
-    }
-    printf("\n%lf\n", time);
-    return 0;
+    // for (int i = 0; i < n; i++) {
+    //     int k = rand() % 64 + 1;
+    //     int v = rand() % 256 + 1;
+    //     string key = random_key(k);
+    //     string value = random_value(v);
+    //     struct timespec ts;
+    //     // bool check1 = kv.get(key);
+    //     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    //     long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
+    //     // bool check1 = kv.get(key);
+    //     bool ans = kv.put(key, value);
+    //     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    //     long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
+    //     time += (en - st);
+    //     printf("%7d\r", i);
+    // }
+    // printf("\n%lf\n", time);
+    // return 0;
     bool incorrect = false;
 
     time = 0;
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 1000000; i++) {
         int x = rand() % 2;
 
         // printf("%7d\r", i);
