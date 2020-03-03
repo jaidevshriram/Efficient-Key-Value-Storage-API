@@ -32,12 +32,12 @@ struct Slice {
 
 class Node { 
 public: 
-Slice *  val; 
+int val; 
 Slice * value ;
 COLOR color; 
 Node *left, *right, *parent; 
 
-Node(Slice *  val) : val( val) { 
+Node(int val) : val(val) { 
 	parent = left = right = NULL; 
 
 	// Node is created during insertion 
@@ -147,7 +147,7 @@ void swapColors(Node *x1, Node *x2) {
 } 
 
 void swapValues(Node *u, Node *v) { 
-	Slice * temp; 
+	int temp; 
 	temp = u->val; 
 	u->val = v->val; 
 	v->val = temp; 
@@ -409,15 +409,15 @@ Node *getRoot() { return root; }
 // searches for given value 
 // if found returns the node (used for delete) 
 // else returns the last node while traversing (used in insert) 
-Node *search(Slice n) { 
+Node *search(int n) { 
 	Node *temp = root; 
 	while (temp != NULL) { 
-	if (strcmp(n.data,temp->val->data)<0) { 
+	if (n < temp->val) { 
 		if (temp->left == NULL) 
 		break; 
 		else
 		temp = temp->left; 
-	} else if (strcmp(n.data, temp->val->data)==0) { 
+	} else if (n == temp->val) { 
 		break; 
 	} else { 
 		if (temp->right == NULL) 
@@ -431,8 +431,8 @@ Node *search(Slice n) {
 } 
 
 // inserts the given value to tree 
-void insert(Slice &n, Slice &k ) {
-	Node *newNode = new Node(&n); 
+void insert(int n, Slice &k ) {
+	Node *newNode = new Node(n); 
     newNode->value=(Slice *)malloc(sizeof(Slice));
     newNode->value->size = k.size;
     newNode->value->data= (char *)malloc(sizeof(char)* k.size);
@@ -449,7 +449,7 @@ void insert(Slice &n, Slice &k ) {
 	} else { 
 	Node *temp = search(n); 
 
-	if (strcmp(temp->val->data,n.data)==0) { 
+	if (temp->val == n) { 
 		// return if value already exists 
 		return; 
 	} 
@@ -460,7 +460,7 @@ void insert(Slice &n, Slice &k ) {
 	// connect new node to correct node 
 	newNode->parent = temp; 
 
-	if (strcmp(n.data, temp->val->data)<0) 
+	if (n < temp->val) 
 		temp->left = newNode; 
 	else
 		temp->right = newNode; 
@@ -471,15 +471,15 @@ void insert(Slice &n, Slice &k ) {
 } 
 
 // utility function that deletes the node with given value 
-void deleteByVal(Slice n) { 
+void deleteByVal(int n) { 
 	if (root == NULL) 
 	// Tree is empty 
 	return; 
 
 	Node *v = search(n), *u; 
 
-	if (strcmp(v->val->data, n.data)!=0) { 
-	cout << "No node found to delete with value:" << n.data << endl; 
+	if (v->val != n) { 
+	cout << "No node found to delete with value:" << n << endl; 
 	return; 
 	} 
 
@@ -510,28 +510,14 @@ void printLevelOrder() {
 int main() { 
 RBTree tree; 
 
-Slice k;
-k.size=1;
-strcpy(k.data,"1");
-
-
-tree.insert(k,k); 
-strcpy(k.data,"2");
-tree.insert(k,k); 
-strcpy(k.data,"3");
-tree.insert(k,k); 
-strcpy(k.data,"4");
-tree.insert(k,k); 
-strcpy(k.data,"5");
-tree.insert(k,k); 
-strcpy(k.data,"6");
-tree.insert(k,k); 
-strcpy(k.data,"8");
-tree.insert(k,k); 
-strcpy(k.data,"9");
-tree.insert(k,k); 
-strcpy(k.data,"10");
-/*
+tree.insert(7,"hiii"); 
+tree.insert(3,"hii"); 
+tree.insert(18,"hii"); 
+tree.insert(22,"hii"); 
+tree.insert(8,"hii"); 
+tree.insert(11,"hii"); 
+tree.insert(26,"hii"); 
+tree.insert(2,"hii"); 
 tree.insert(6,"hii"); 
 tree.insert(13,"hii"); 
 tree.insert(10,"hii"); 
@@ -539,14 +525,18 @@ tree.insert(10,"hii");
 tree.insert(10,"hii"); 
 tree.insert(10,"hii"); 
 tree.insert(10,"hii"); 
-*/
+
 
 tree.printInOrder(); 
 tree.printLevelOrder(); 
 
 cout<<endl<<"Deleting 18, 11, 3, 10, 22"<<endl; 
 
-tree.deleteByVal(k); 
+tree.deleteByVal(18); 
+tree.deleteByVal(11); 
+tree.deleteByVal(3); 
+tree.deleteByVal(10); 
+tree.deleteByVal(22); 
 
 tree.printInOrder(); 
 tree.printLevelOrder(); 
