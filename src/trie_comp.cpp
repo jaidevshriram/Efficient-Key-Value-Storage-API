@@ -181,6 +181,7 @@ class Trie {
                                              : key.data[len] - 65;
                 TrieNode *old_curr = curr;
                 curr = (TrieNode *)curr->arr[x];
+                pthread_rwlock_rdlock(&(curr->lock));
                 Slice *pp = curr->word_span;
                 int iter = curr->left;
                 while (iter <= curr->right && len < (int)key.size &&
@@ -190,11 +191,13 @@ class Trie {
                 }
                 if (len != key.size) {
                     if (iter == curr->right + 1) {
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                     }
                 } else {
                     if (iter == curr->right + 1)
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                 }
@@ -251,6 +254,7 @@ class Trie {
 
                 TrieNode *old_curr = curr;
                 curr = (TrieNode *)curr->arr[x];
+                pthread_rwlock_wrlock(&(curr->lock));
                 
                 Slice *pp = curr->word_span;
                 
@@ -264,6 +268,7 @@ class Trie {
                 
                 if (len != (int)key.size) {
                     if (iter == curr->right + 1) {
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                     } else {
@@ -311,12 +316,14 @@ class Trie {
                         zzz = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                                    : key.data[len] - 65;
                         curr->arr[zzz] = new_node;
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         return 0;
                     }
                 } else {
                     if (iter == curr->right + 1)
                     {
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                     }
@@ -341,6 +348,7 @@ class Trie {
                         curr->right = iter - 1;
                         // curr->children++;
                         curr->value = NULL;
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                     }
                 }
@@ -383,6 +391,7 @@ class Trie {
                     return 0;
                 }
                 TrieNode * old_curr = curr;
+                pthread_rwlock_rdlock(&(curr->lock));
                 curr = (TrieNode *)curr->arr[x];
                 Slice *pp = curr->word_span;
                 int iter = curr->left;
@@ -393,17 +402,21 @@ class Trie {
                 }
                 if (len != key.size) {
                     if (iter == curr->right + 1) {
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                     } else {
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         return 0;
                     }
                 } else {
                     if (iter == curr->right + 1){
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                     }else {
+                        pthread_rwlock_unlock(&(curr->lock));
                         pthread_rwlock_unlock(&(old_curr->lock));
                         return 0;
                     }
