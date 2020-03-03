@@ -311,7 +311,15 @@ class Trie {
                 if (curr->arr[x] == NULL) {
                     return 0;
                 }
-                curr = (TrieNode *)curr->arr[x];
+                // TODO: Review this please
+                if(!curr->children) {
+                    TrieNode * saveOld = (TrieNode *)curr->arr[x];
+                    curr->arr[x] = NULL;
+                    curr = saveOld;
+                } else {
+                    curr = (TrieNode *)curr->arr[x];
+                }
+
                 Slice * pp = curr->word_span;
                 int iter = curr->left;
                 while(iter <= curr->right && len < (int)key.size && pp->data[iter] == key.data[len]) {
