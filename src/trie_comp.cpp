@@ -222,6 +222,7 @@ class Trie {
         TrieNode *curr = root;
         
         while (curr != NULL) {
+            // cout << "insert aquiring lock"<< endl;
             pthread_rwlock_wrlock(&(curr->lock));
             curr->children++;
             if (len < key.size) {
@@ -382,6 +383,7 @@ class Trie {
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
+            // cout << "get val aquiring lock"<< endl;
             pthread_rwlock_rdlock(&(curr->lock));
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
@@ -391,8 +393,8 @@ class Trie {
                     return 0;
                 }
                 TrieNode * old_curr = curr;
-                pthread_rwlock_rdlock(&(curr->lock));
                 curr = (TrieNode *)curr->arr[x];
+                pthread_rwlock_rdlock(&(curr->lock));
                 Slice *pp = curr->word_span;
                 int iter = curr->left;
                 while (iter <= curr->right && len < (int)key.size &&
