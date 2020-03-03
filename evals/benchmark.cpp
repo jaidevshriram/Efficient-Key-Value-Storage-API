@@ -141,6 +141,7 @@ long double st, en, total = 0;
 
 int main() {
     long double total = 0;
+    srand(time(0));
 
     for (int i = 0; i < INSERTS; i++) {
         string key = random_key(rand() % key_size + 1);
@@ -188,13 +189,14 @@ int main() {
             // string key = random_key(key_size);
             strToSlice(key, s_key);
 
-            // printf("GET OP: %s\n", key);
+            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool ans = kv.get(s_key, s_value);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
+            cout << "OUT\n";
 
             map<string, string>::iterator itr = db.find(key);
             if ((ans == false && itr != db.end()) ||
@@ -219,30 +221,24 @@ int main() {
             strToSlice(key, s_key);
             strToSlice(value, s_value);
 
+            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool ans = kv.put(s_key, s_value);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
+            cout << "OUT\n";
 
             Slice check;
             bool check2 = kv.get(s_key, check);
             db_size = db.size();
 
-            /*
-             * TODO: make this normal again
-             * currently, put returns true always
-             * if(check2 == false || value != sliceToStr(check))
-             */
             if (check2 == false || value != sliceToStr(check)) {
                 incorrect = true;
-                // TODO
                 cout << "\nSome error with put, will check later" << endl;
             }
         } else if (x == 2) {
-            OPS_COUNTER--;
-            continue;
             // DESCRIPTION: DELETE
             int rem = rand() % db.size();
             map<string, string>::iterator itr = db.begin();
@@ -250,6 +246,7 @@ int main() {
             string key = itr->first;
             strToSlice(key, s_key);
 
+            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool check = kv.del(s_key);
@@ -257,6 +254,7 @@ int main() {
             // printf("DEL OP\n");
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
+            cout << "OUT\n";
 
             db.erase(itr);
             db_size--;
@@ -271,12 +269,14 @@ int main() {
             // DESCRIPTION: GET N
             int rem = rand() % db_size;
 
+            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool check = kv.get(rem, s_key, s_value);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
+            cout << "OUT\n";
 
             map<string, string>::iterator itr = db.begin();
             for (int i = 0; i < rem; i++)
@@ -300,12 +300,14 @@ int main() {
                 itr++;
             string key = itr->first;
 
+            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool check = kv.del(rem);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
+            cout << "OUT\n";
 
             db.erase(itr);
             db_size--;
@@ -314,12 +316,13 @@ int main() {
 
             if (check2 == true) {
                 incorrect = true;
-                cout << "Supposed to delete key " << key;
+                cout << "\nSupposed to delete key " << key;
                 cout << "\nFound nth key " << key << " after deleting\n";
             }
         }
 
-        cout << "\r" << i;
+        //  printf("\r%8d", i);
+        printf("\r%8d %10s::%Lfs", i, DESCRIPTION[x].c_str(), total);
 
         if (incorrect == true) {
             cout << "\rError in operation " << DESCRIPTION[x] << "\n Completed "

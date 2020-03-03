@@ -21,7 +21,7 @@ class kvStore {
 
         /*
          * TODO
-         * insert doesn't replace old values
+         * UPDATE THIS
          */
         return true;
     }
@@ -32,12 +32,13 @@ class kvStore {
 
     bool get(int N, Slice &key, Slice &value) {
         db.get_val_N(N, key, value);
-        // TODO: implement this
         return true;
     }
 
     bool del(int N) {
-        // TODO: implement this
+        Slice key, value;
+        db.get_val_N(N, key, value);
+        db.del(key);
         return true;
     }
 };
