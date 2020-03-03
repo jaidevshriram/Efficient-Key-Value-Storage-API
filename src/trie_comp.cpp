@@ -297,88 +297,46 @@ class Trie {
     }
 
     bool del(Slice &key) {
+        Slice v;
+        if (!get_val(key, v))
+            return 0;
         int len = 0;
         TrieNode *curr = root;
+
         while (curr != NULL) {
+            curr->children--;
             if (len < key.size) {
-                int x = (key.data[len] >= 'a') ? key.data[len] - 'a' + 26
-                                             : key.data[len] - 'A';
+                int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
+                    : key.data[len] - 65;
                 if (curr->arr[x] == NULL) {
                     return 0;
                 }
                 curr = (TrieNode *)curr->arr[x];
-                Slice *pp = curr->word_span;
+                Slice * pp = curr->word_span;
                 int iter = curr->left;
-                while (iter <= curr->right && len < (int)key.size &&
-                       pp->data[iter] == key.data[len]) {
+                while(iter <= curr->right && len < (int)key.size && pp->data[iter] == key.data[len]) {
                     len++;
                     iter++;
                 }
-                if (len != key.size) {
-                    if (iter == curr->right + 1) {
-                        continue;
-                    } else {
-                        return 0;
-                    }
+                if(iter > curr->right) {
+                    continue;
                 } else {
-                    if (iter == curr->right + 1)
-                        continue;
-                    else {
-                        return 0;
-                    }
-                }
-
-            } else if (len == key.size) {
-                if (curr->value == NULL)
                     return 0;
-                else {
+                }
+            } else if (len == key.size) {
+                if(curr->value == NULL) {
+                    return 0;
+                } else {
                     free(curr->value->data);
                     free(curr->value);
                     curr->value = NULL;
                     return 1;
                 }
             }
-            // len++;
         }
 
-        return 1;
-        // Slice v;
-        // if (!get_val(key, v))
-        //     return 0;
-        // int len = 0;
-        // TrieNode *curr = root;
-
-        // while (curr != NULL) {
-        //     curr->children--;
-        //     if (len < key.size) {
-        //         int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
-        //                                      : key.data[len] - 65;
-        //         if (curr->arr[x] == NULL)
-        //             return 0;
-        //         TrieNode *p = curr;
-        //         curr = (TrieNode *)curr->arr[x];
-        //         if (p->children == 0 && p != root)
-        //             free(p);
-        //         else {
-        //             if (curr->children == 1)
-        //                 p->arr[x] = NULL;
-        //         }
-        //     } else if (len == key.size) {
-        //         if (curr->value == NULL)
-        //             return 0;
-        //         else {
-        //             // cout << curr->letter << " " << curr->children << endl;
-        //             if (curr->children == 0) {
-        //                 free(curr);
-        //             } else {
-        //                 free(curr->value);
-        //                 curr->value = NULL;
-        //             }
-        //             return 1;
-        //         }
-        //     }
-        //     len++;
-        // }
+        cout << "UNREACHABLE\n";
+        return 0;
     }
 
     bool get_val_N(int n, Slice &key, Slice &value) {

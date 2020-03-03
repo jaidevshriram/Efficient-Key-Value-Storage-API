@@ -181,7 +181,7 @@ int main() {
     bool incorrect = false;
 
     for (int i = 0; i < NUM_OPS; i++, OPS_COUNTER++) {
-        int x = rand() % 4;
+        int x = rand() % 5;
         if (x == 0) {
             // DESCRIPTION: GET
             string key = random_key(rand() % key_size + 1);
@@ -200,7 +200,7 @@ int main() {
             if ((ans == false && itr != db.end()) ||
                 (ans == true && itr->second != sliceToStr(s_value))) {
                 incorrect = true;
-                cout << "\rIncorrect GET for key " << key << "\nFound in kv? "
+                cout << "\nIncorrect GET for key " << key << "\nFound in kv? "
                      << ans << "\nFound in db? " << (itr != db.end())
                      << "\nValues equal? "
                      << (itr->second == sliceToStr(s_value)) << endl;
@@ -238,7 +238,7 @@ int main() {
             if (check2 == false || value != sliceToStr(check)) {
                 incorrect = true;
                 // TODO
-                cout << "\rSome error with put, will check later" << endl;
+                cout << "\nSome error with put, will check later" << endl;
             }
         } else if (x == 2) {
             OPS_COUNTER--;
@@ -264,7 +264,7 @@ int main() {
             bool check2 = kv.get(s_key, s_value);
             if (check2 == true) {
                 incorrect = true;
-                cout << "\rExpected to not find key " << key
+                cout << "\nExpected to not find key " << key
                      << " in kv, found it" << endl;
             }
         } else if (x == 3) {
@@ -285,8 +285,8 @@ int main() {
             if (itr->first != sliceToStr(s_key) ||
                 itr->second != sliceToStr(s_value)) {
                 incorrect = true;
-                cout << "N: " << rem << '\n';
-                cout << "\rget(n)\nkeys same? "
+                cout << "\nN: " << rem << '\n';
+                cout << "get(n)\nkeys same? "
                      << (itr->first == sliceToStr(s_key)) << "\nvalues same? "
                      << (itr->second == sliceToStr(s_value)) << endl;
                 cout << "Key: Supposed to be " << itr->first << "\n Found "
@@ -314,7 +314,8 @@ int main() {
 
             if (check2 == true) {
                 incorrect = true;
-                cout << "\rFound nth key " << key << "pair after deleting\n";
+                cout << "Supposed to delete key " << key;
+                cout << "\nFound nth key " << key << " after deleting\n";
             }
         }
 
