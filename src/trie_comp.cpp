@@ -219,6 +219,7 @@ class Trie {
         TrieNode *curr = root;
         
         while (curr != NULL) {
+            pthread_rwlock_wrlock(&(curr->lock));
             curr->children++;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
@@ -244,9 +245,11 @@ class Trie {
                         new_node->value->data[j] = value.data[j];
                     }
                     curr->arr[x] = new_node;
+                    pthread_rwlock_unlock(&(curr->lock));
                     return 0;
                 }
 
+                TrieNode *old_curr = curr;
                 curr = (TrieNode *)curr->arr[x];
                 
                 Slice *pp = curr->word_span;
@@ -261,6 +264,7 @@ class Trie {
                 
                 if (len != (int)key.size) {
                     if (iter == curr->right + 1) {
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                     } else {
                         // split here
@@ -307,11 +311,15 @@ class Trie {
                         zzz = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                                    : key.data[len] - 65;
                         curr->arr[zzz] = new_node;
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         return 0;
                     }
                 } else {
                     if (iter == curr->right + 1)
+                    {
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
+                    }
                     else {
                         TrieNode *y = getTrieNode();
                         y->value = curr->value;
@@ -333,6 +341,7 @@ class Trie {
                         curr->right = iter - 1;
                         // curr->children++;
                         curr->value = NULL;
+                        pthread_rwlock_unlock(&(old_curr->lock));
                     }
                 }
 
@@ -350,6 +359,7 @@ class Trie {
                 if (rv == 1)
                     red_children(key);
                 // cout << curr->value.data << '\n';
+                pthread_rwlock_unlock(&(curr->lock));
                 return rv;
             }
             // len++;
@@ -363,12 +373,15 @@ class Trie {
         int len = 0;
         TrieNode *curr = root;
         while (curr != NULL) {
+            pthread_rwlock_rdlock(&(curr->lock));
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
                 if (curr->arr[x] == NULL) {
+                    pthread_rwlock_unlock(&(curr->lock));
                     return 0;
                 }
+                TrieNode * old_curr = curr;
                 curr = (TrieNode *)curr->arr[x];
                 Slice *pp = curr->word_span;
                 int iter = curr->left;
@@ -379,27 +392,33 @@ class Trie {
                 }
                 if (len != key.size) {
                     if (iter == curr->right + 1) {
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                     } else {
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         return 0;
                     }
                 } else {
-                    if (iter == curr->right + 1)
+                    if (iter == curr->right + 1){
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
-                    else {
+                    }else {
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         return 0;
                     }
                 }
 
             } else if (len == key.size) {
-                if (curr->value == NULL)
+                if (curr->value == NULL){
+                    pthread_rwlock_unlock(&(curr->lock));
                     return 0;
-                else {
+                }else {
                     value.size = curr->value->size;
                     value.data = (char *)malloc(sizeof(char) * value.size);
                     for (int j = 0; j < value.size; j++) {
                         value.data[j] = curr->value->data[j];
                     }
+                    pthread_rwlock_unlock(&(curr->lock));
                     return 1;
                 }
             }
