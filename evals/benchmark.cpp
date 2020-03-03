@@ -50,7 +50,7 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 100000;
+const uint MAX_KEYS = 10000000, INSERTS = 1000000, NUM_OPS = 100000;
 const long CLOCKS_PER_SECOND = 1000000;
 const uint key_size = 64, val_size = 255;
 
@@ -189,14 +189,12 @@ int main() {
             // string key = random_key(key_size);
             strToSlice(key, s_key);
 
-            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool ans = kv.get(s_key, s_value);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
-            cout << "OUT\n";
 
             map<string, string>::iterator itr = db.find(key);
             if ((ans == false && itr != db.end()) ||
@@ -221,14 +219,12 @@ int main() {
             strToSlice(key, s_key);
             strToSlice(value, s_value);
 
-            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool ans = kv.put(s_key, s_value);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
-            cout << "OUT\n";
 
             Slice check;
             bool check2 = kv.get(s_key, check);
@@ -246,7 +242,6 @@ int main() {
             string key = itr->first;
             strToSlice(key, s_key);
 
-            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool check = kv.del(s_key);
@@ -254,7 +249,6 @@ int main() {
             // printf("DEL OP\n");
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
-            cout << "OUT\n";
 
             db.erase(itr);
             db_size--;
@@ -269,14 +263,12 @@ int main() {
             // DESCRIPTION: GET N
             int rem = rand() % db_size;
 
-            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool check = kv.get(rem, s_key, s_value);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
-            cout << "OUT\n";
 
             map<string, string>::iterator itr = db.begin();
             for (int i = 0; i < rem; i++)
@@ -300,14 +292,12 @@ int main() {
                 itr++;
             string key = itr->first;
 
-            cout << "\nGOING IN\n";
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool check = kv.del(rem);
             clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
             en = ts.tv_nsec / (1e9) + ts.tv_sec;
             total += (en - st);
-            cout << "OUT\n";
 
             db.erase(itr);
             db_size--;

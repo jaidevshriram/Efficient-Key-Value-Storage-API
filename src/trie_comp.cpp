@@ -312,10 +312,18 @@ class Trie {
                     return 0;
                 }
                 // TODO: Review this please
-                if(!curr->children) {
-                    TrieNode * saveOld = (TrieNode *)curr->arr[x];
+                TrieNode* newCurr = (TrieNode *) curr->arr[x];
+                if(newCurr->children == 1) {
                     curr->arr[x] = NULL;
-                    curr = saveOld;
+                    curr = newCurr;
+                    continue;
+                }
+
+                if(!curr->children) {
+                    TrieNode *newCurr = (TrieNode *)curr->arr[x];
+                    // TODO: FREE
+                    free(curr);
+                    curr = newCurr;
                 } else {
                     curr = (TrieNode *)curr->arr[x];
                 }
