@@ -477,6 +477,7 @@ class Trie {
         TrieNode *curr = root;
 
         while (curr != NULL) {
+            pthread_rwlock_wrlock(&(curr->lock));
             curr->children--;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
@@ -486,9 +487,14 @@ class Trie {
                 }
                 // TODO: Review this please
                 TrieNode* newCurr = (TrieNode *) curr->arr[x];
+                pthread_rwlock_rdlock(&(newCurr->lock));
+                TrieNode* old_curr = curr;
                 if(newCurr->children == 1) {
                     curr->arr[x] = NULL;
+                    TrieNode* old_curr = curr;
                     curr = newCurr;
+                    pthread_rwlock_unlock(&(newCurr->lock));
+                     pthread_rwlock_unlock(&(old_curr->lock));
                     continue;
                 }
 
@@ -507,8 +513,10 @@ class Trie {
                     iter++;
                 }
                 if(iter > curr->right) {
+                    pthread_rwlock_unlock(&(old_curr->lock));
                     continue;
                 } else {
+                    pthread_rwlock_unlock(&(old_curr->lock));
                     return 0;
                 }
             } else if (len == key.size) {
