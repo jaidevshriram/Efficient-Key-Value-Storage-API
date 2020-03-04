@@ -3,7 +3,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define TRIE_LIST_SIZE 8000000
+#define TRIE_LIST_SIZE 0
 #define TRIE_ARRAY_SIZE 52
 
 #define SLICE_LIST_SIZE 0
@@ -11,6 +11,15 @@ using namespace std;
 struct Slice {
     uint8_t size;
     char *data;
+
+    Slice() {
+    }
+
+    Slice(string a) {
+        size = a.length();
+        data = (char *)malloc(a.length());
+        memcpy(data, a.data(), a.length());
+    }
 };
 
 struct TrieNode {
@@ -29,6 +38,7 @@ class Trie {
     TrieNode *root;
     TrieNode *freeTrieList;
     Slice *freeSliceList;
+    int missedFreeTrieNode;
 
     TrieNode* getTrieNode() {
         
@@ -38,6 +48,7 @@ class Trie {
             temp = freeTrieList;
             freeTrieList = (TrieNode *) freeTrieList->value;
         } else {
+            missedFreeTrieNode++;
             temp = (TrieNode *)malloc(sizeof(TrieNode));
         }
 
@@ -81,6 +92,8 @@ class Trie {
 
     Trie() {
 
+        missedFreeTrieNode = 0;
+
         // Initialize the TrieNodeBlock (the list of memory blocks)
         freeTrieList = (TrieNode *)malloc(sizeof(TrieNode));
         freeTrieList->value = NULL;
@@ -113,14 +126,17 @@ class Trie {
             if(root_node->word_span->data)
                 free(root_node->word_span->data);
             
-            for(int i=0; i<TRIE_ARRAY_SIZE; i++) 
-                delete_recursive((TrieNode *)root_node->arr[i]);
+            for(int i=0; i<TRIE_ARRAY_SIZE; i++)
+                if(root_node->arr[i])
+                    delete_recursive((TrieNode *)root_node->arr[i]);
 
             free(root_node);
         }
     }
 
     ~Trie() {
+
+        printf("Missed allocations: %d\n", missedFreeTrieNode);
 
         for(TrieNode *block = freeTrieList; block!=NULL; ) {
             TrieNode *temp = block;
