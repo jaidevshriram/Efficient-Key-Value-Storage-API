@@ -1,9 +1,11 @@
 #!/bin/bash
 
-zip 2018101012_2018101019_2018111010_2018111022.zip trie_comp.cpp kvStore.cpp || { echo "Error in making zip"; exit 1; }
+ROLL=2018101012_2018101019_2018111010_2018111022
+
+zip "$ROLL.zip" trie_comp.cpp kvStore.cpp || { echo "Error in making zip"; exit 1; }
 
 echo "Generating mail..."
-mpack -s "2018101012_2018101019_2018111010_2018111022" -o mail ./2018101012_2018101019_2018111010_2018111022.zip || { echo "Error in generating mail"; exit 1; }
+mpack -s "$ROLL" -o mail ./2018101012_2018101019_2018111010_2018111022.zip || { echo "Error in generating mail"; exit 1; }
 sed -i "3iTo: spop.iiith@gmail.com" mail
 
 echo "Sending mail..."
