@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <bits/stdc++.h>
+#include <pthread.h>
 using namespace std;
 
 #define TRIE_LIST_SIZE 0
@@ -29,6 +30,7 @@ struct TrieNode {
     int children;
     Slice *word_span;
     int left, right;  // (both inclusive)
+    pthread_rwlock_t lock;
 };
 
 class Trie {
@@ -50,6 +52,7 @@ class Trie {
         } else {
             missedFreeTrieNode++;
             temp = (TrieNode *)malloc(sizeof(TrieNode));
+            pthread_rwlock_init(&(freeTrieList->lock), NULL);
         }
 
         temp->left = temp->right = 0;
@@ -97,11 +100,13 @@ class Trie {
         // Initialize the TrieNodeBlock (the list of memory blocks)
         freeTrieList = (TrieNode *)malloc(sizeof(TrieNode));
         freeTrieList->value = NULL;
+        pthread_rwlock_init(&(freeTrieList->lock), NULL);
 
         // Generate the entire free list
         for(int i=0; i<TRIE_LIST_SIZE; i++) {
             TrieNode *temp = (TrieNode *)malloc(sizeof(TrieNode));
             temp->value = (Slice *) freeTrieList;
+            pthread_rwlock_init(&(freeTrieList->lock), NULL);
             freeTrieList = temp;
         }
     
@@ -159,16 +164,22 @@ class Trie {
         Slice *new_key = getSlice();
         new_key->size = key.size;
         new_key->data = (char *)malloc(sizeof(char) * key.size);
+        
         for (int i = 0; i < key.size; i++) {
             new_key->data[i] = key.data[i];
         }
+        
         int len = 0;
+        
         TrieNode *curr = root;
+        
         while (curr != NULL) {
+            pthread_rwlock_wrlock(&(curr->lock));
             curr->children--;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
+                TrieNode *old_curr = curr;
                 curr = (TrieNode *)curr->arr[x];
                 Slice *pp = curr->word_span;
                 int iter = curr->left;
@@ -179,20 +190,20 @@ class Trie {
                 }
                 if (len != key.size) {
                     if (iter == curr->right + 1) {
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                     }
                 } else {
                     if (iter == curr->right + 1)
+                        pthread_rwlock_unlock(&(old_curr->lock));
                         continue;
                 }
 
             } else if (len == key.size) {
+                pthread_rwlock_unlock(&(curr->lock));
                 return 1;
             }
-            // len++;
         }
-        // return 0;
-        // cur.arr['a'] = &cur;
     }
 
     bool insert(Slice &key, Slice &value) {
