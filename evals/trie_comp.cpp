@@ -510,7 +510,7 @@ class Trie {
                     free(curr);
                 }
 
-                curr = (TrieNode *)curr->arr[x];
+                curr = newCurr;
                 cout<<"\033[0;32m Lock Obtained"<<endl;
                 pthread_rwlock_rdlock(&(curr->word_span->lock));
                 Slice * pp = curr->word_span;
