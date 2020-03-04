@@ -526,13 +526,11 @@ class Trie {
             } else if (len == key.size) {
                 if(curr->value == NULL) {
                     pthread_rwlock_unlock(&(curr->lock));
-                    pthread_rwlock_unlock(&(old_curr->lock));
                     return 0;
                 } else {
                     free(curr->value->data);
                     free(curr->value);
                     pthread_rwlock_unlock(&(curr->lock));
-                    pthread_rwlock_unlock(&(old_curr->lock));
                     curr->value = NULL;
                     return 1;
                 }
