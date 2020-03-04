@@ -27,14 +27,10 @@ class kvStore {
 
     bool put(Slice &key, Slice &value) {
         pthread_rwlock_wrlock(&lock);
-        db.insert(key, value);
+        bool ret = db.insert(key, value);
         pthread_rwlock_unlock(&lock);
 
-        /*
-         * TODO
-         * UPDATE THIS
-         */
-        return true;
+        return ret;
     }
 
     bool del(Slice &key) {

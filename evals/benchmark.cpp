@@ -25,10 +25,12 @@ void strToSlice(string l, Slice &a) {
 string random_key(int stringLength) {
     string k = "";
     string letters = "";
+
     for (char i = 'a'; i <= 'z'; i++)
         letters += i;
     for (char i = 'A'; i <= 'Z'; i++)
         letters += i;
+
     for (int i = 0; i < stringLength; i++)
         k = k + letters[rand() % 52];
 
@@ -38,11 +40,9 @@ string random_key(int stringLength) {
 string random_value(int stringLength) {
     string v = "";
     string letters = "";
-    for (char i = 'A'; i <= 'Z'; i++)
-        letters += i;
 
-    for (char i = 'a'; i <= 'z'; i++)
-        letters += i;
+    for (int i = 32; i < 127; i++)
+        letters += (char)i;
 
     for (int i = 0; i < stringLength; i++)
         v = v + letters[rand() % letters.size()];
@@ -74,7 +74,6 @@ void *myThreadFun(void *vargp) {
     while ((float(tt - start) / CLOCKS_PER_SECOND) <= time) {
         for (int i = 0; i < 10000; i++) {
             transactions += 1;
-
             int x = rand() % 5;
             if (x == 0) {
                 string key = random_key(rand() % key_size + 1);
@@ -143,22 +142,12 @@ int main() {
         strToSlice(key, s_key);
         strToSlice(value, s_value);
 
-        if (kv.get(s_key, s_value)) {
-            cout << "\rFAKE GET           \n";
-            exit(1);
-        }
-
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
         st = ts.tv_nsec / (1e9) + ts.tv_sec;
         kv.put(s_key, s_value);
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
         en = ts.tv_nsec / (1e9) + ts.tv_sec;
         total += (en - st);
-
-        if (!kv.get(s_key, s_value)) {
-            cout << "\rMISSED GET         \n";
-            exit(1);
-        }
 
         db_size = db.size();
         printf("\r%8d", i);

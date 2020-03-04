@@ -419,7 +419,7 @@ class Trie {
                 if (curr->arr[x] == NULL) {
                     return 0;
                 }
-                // TODO: Review this please
+
                 TrieNode *newCurr = (TrieNode *)curr->arr[x];
 
                 if (newCurr->children == 1) {
