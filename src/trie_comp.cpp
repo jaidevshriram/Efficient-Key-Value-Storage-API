@@ -4,7 +4,7 @@
 #include <pthread.h>
 using namespace std;
 
-#define TRIE_LIST_SIZE 0
+#define TRIE_LIST_SIZE 1000000
 #define TRIE_ARRAY_SIZE 52
 
 #define SLICE_LIST_SIZE 0
@@ -52,7 +52,7 @@ class Trie {
         } else {
             missedFreeTrieNode++;
             temp = (TrieNode *)malloc(sizeof(TrieNode));
-            pthread_rwlock_init(&(freeTrieList->lock), NULL);
+            pthread_rwlock_init(&(temp->lock), NULL);
         }
 
         temp->left = temp->right = 0;
@@ -106,7 +106,7 @@ class Trie {
         for(int i=0; i<TRIE_LIST_SIZE; i++) {
             TrieNode *temp = (TrieNode *)malloc(sizeof(TrieNode));
             temp->value = (Slice *) freeTrieList;
-            pthread_rwlock_init(&(freeTrieList->lock), NULL);
+            pthread_rwlock_init(&(temp->lock), NULL);
             freeTrieList = temp;
         }
     
@@ -356,11 +356,12 @@ class Trie {
                 for (int j = 0; j < value.size; j++) {
                     curr->value->data[j] = value.data[j];
                 }
+                pthread_rwlock_unlock(&(curr->lock));
                 if (rv == 1)
                     red_children(key);
                 // cout << curr->value.data << '\n';
-                pthread_rwlock_unlock(&(curr->lock));
-                return rv;
+                
+                    return rv;
             }
             // len++;
         }
