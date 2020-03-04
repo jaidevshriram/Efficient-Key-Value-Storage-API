@@ -25,10 +25,12 @@ void strToSlice(string l, Slice& a) {
 string random_key(int stringLength) {
     string k = "";
     string letters = "";
+
     for (char i = 'a'; i <= 'z'; i++)
         letters += i;
     for (char i = 'A'; i <= 'Z'; i++)
         letters += i;
+
     for (int i = 0; i < stringLength; i++)
         k = k + letters[rand() % 52];
 
@@ -38,11 +40,9 @@ string random_key(int stringLength) {
 string random_value(int stringLength) {
     string v = "";
     string letters = "";
-    for (char i = 'A'; i <= 'Z'; i++)
-        letters += i;
 
-    for (char i = 'a'; i <= 'z'; i++)
-        letters += i;
+    for(int i = 32; i < 127; i++)
+        letters += (char)i;
 
     for (int i = 0; i < stringLength; i++)
         v = v + letters[rand() % letters.size()];
@@ -50,8 +50,8 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 0;
-const long CLOCKS_PER_SECOND = 10000000;
+const uint MAX_KEYS = 10000000, INSERTS = 1000000, NUM_OPS = 0;
+const long CLOCKS_PER_SECOND = 1000000;
 const uint key_size = 64, val_size = 255;
 
 kvStore kv(MAX_KEYS);
@@ -67,62 +67,61 @@ uint OPS_COUNTER = 0;
  * Commented out this useless function
  */
 void *myThreadFun(void *vargp) {
-	int transactions=0;
-	clock_t start = clock();
-	int time = 10;
-	clock_t tt = clock();
-	while((float(tt-start)/CLOCKS_PER_SECOND)<=time) {
-		for(int i=0;i<10000;i++) {
-			transactions+=1;
+    int transactions=0;
+    clock_t start = clock();
+    int time = 10;
+    clock_t tt = clock();
+    while((float(tt-start)/CLOCKS_PER_SECOND)<=time) {
+        for(int i=0;i<10000;i++) {
+            transactions+=1;
+            int x = rand() % 5;
+            if(x==0) {
+                string key = random_key(rand()%key_size + 1);
+                Slice s_key,s_value;
+                strToSlice(key,s_key);
+                bool ans = kv.get(s_key,s_value);
+            } else if(x==1) {
+                string key = random_key(rand()%key_size + 1);
+                string value = random_value(rand()%255 + 1);
+                Slice s_key,s_value,temp;
+                strToSlice(key,s_key);
+                strToSlice(value,s_value);
 
-			int x = rand() % 5;
-			if(x==0) {
-				string key = random_key(rand()%key_size + 1);
-				Slice s_key,s_value;
-				strToSlice(key,s_key);
-				bool ans = kv.get(s_key,s_value);
-			} else if(x==1) {
-				string key = random_key(rand()%key_size + 1);
-				string value = random_value(rand()%255 + 1);
-				Slice s_key,s_value,temp;
-				strToSlice(key,s_key);
-				strToSlice(value,s_value);
+                bool check = kv.get(s_key,temp);
+                bool ans = kv.put(s_key,s_value);
 
-				bool check = kv.get(s_key,temp);
-				bool ans = kv.put(s_key,s_value);
+                if(check == false)
+                    db_size++;
+            } else if(x==2) {
+                int temp=db_size;
+                if (temp == 0)
+                    continue;
+                int rem = rand()%temp;
+                Slice s_key,s_value;
+                bool check = kv.get(rem,s_key,s_value);
+                check = kv.del(s_key);
+                db_size--;
+            } else if(x==3) {
+                int temp=db_size;
+                if (temp == 0)
+                    continue;
+                int rem = rand()%temp;
+                Slice s_key,s_value;
+                bool check = kv.get(rem,s_key,s_value);
+            } else if(x==4) {
+                int temp=db_size;
+                if (temp == 0)
+                    continue;
+                int rem = rand()%temp;
+                bool check = kv.del(rem);
+                db_size--;
+            }
+        }
+        tt=clock();
+    }
 
-				if(check == false)
-					db_size++;
-			} else if(x==2) {
-				int temp=db_size;
-				if (temp == 0)
-					continue;
-				int rem = rand()%temp;
-				Slice s_key,s_value;
-				bool check = kv.get(rem,s_key,s_value);
-				check = kv.del(s_key);
-				db_size--;
-			} else if(x==3) {
-				int temp=db_size;
-				if (temp == 0)
-					continue;
-				int rem = rand()%temp;
-				Slice s_key,s_value;
-				bool check = kv.get(rem,s_key,s_value);
-			} else if(x==4) {
-				int temp=db_size;
-				if (temp == 0)
-					continue;
-				int rem = rand()%temp;
-				bool check = kv.del(rem);
-				db_size--;
-			}
-		}
-		tt=clock();
-	}
-
-	cout<<transactions/time<<endl;
-	return NULL;
+    cout<<transactions/time<<endl;
+    return NULL;
 }
 
 struct timespec ts;
@@ -143,22 +142,12 @@ int main() {
         strToSlice(key, s_key);
         strToSlice(value, s_value);
 
-        if (kv.get(s_key, s_value)) {
-            cout << "\rFAKE GET           \n";
-            exit(1);
-        }
-
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
         st = ts.tv_nsec / (1e9) + ts.tv_sec;
         kv.put(s_key, s_value);
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
         en = ts.tv_nsec / (1e9) + ts.tv_sec;
         total += (en - st);
-
-        if (!kv.get(s_key, s_value)) {
-            cout << "\rMISSED GET         \n";
-            exit(1);
-        }
 
         db_size = db.size();
         printf("\r%8d", i);
@@ -187,14 +176,14 @@ int main() {
 
             map<string, string>::iterator itr = db.find(key);
             if ((ans == false && itr != db.end()) ||
-                (ans == true && itr->second != sliceToStr(s_value))) {
+                    (ans == true && itr->second != sliceToStr(s_value))) {
                 incorrect = true;
                 cout << "\nIncorrect GET for key " << key << "\nFound in kv? "
-                     << ans << "\nFound in db? " << (itr != db.end())
-                     << "\nValues equal? "
-                     << (itr->second == sliceToStr(s_value)) << endl;
+                    << ans << "\nFound in db? " << (itr != db.end())
+                    << "\nValues equal? "
+                    << (itr->second == sliceToStr(s_value)) << endl;
                 cout << "Value in kv is " << sliceToStr(s_value)
-                     << " and in db is " << itr->second << endl;
+                    << " and in db is " << itr->second << endl;
                 cout << "Size of val in db is " << itr->second.size() << endl;
             }
         } else if (x == 1) {
@@ -246,7 +235,7 @@ int main() {
             if (check2 == true) {
                 incorrect = true;
                 cout << "\nExpected to not find key " << key
-                     << " in kv, found it" << endl;
+                    << " in kv, found it" << endl;
             }
         } else if (x == 3) {
             // DESCRIPTION: GET N
@@ -264,14 +253,14 @@ int main() {
                 itr++;
 
             if (itr->first != sliceToStr(s_key) ||
-                itr->second != sliceToStr(s_value)) {
+                    itr->second != sliceToStr(s_value)) {
                 incorrect = true;
                 cout << "\nN: " << rem << '\n';
                 cout << "get(n)\nkeys same? "
-                     << (itr->first == sliceToStr(s_key)) << "\nvalues same? "
-                     << (itr->second == sliceToStr(s_value)) << endl;
+                    << (itr->first == sliceToStr(s_key)) << "\nvalues same? "
+                    << (itr->second == sliceToStr(s_value)) << endl;
                 cout << "Key: Supposed to be " << itr->first << "\n Found "
-                     << sliceToStr(s_key) << '\n';
+                    << sliceToStr(s_key) << '\n';
             }
         } else if (x == 4) {
             // DESCRIPTION: DELETE N
@@ -305,7 +294,7 @@ int main() {
 
         if (incorrect == true) {
             cout << "\rError in operation " << DESCRIPTION[x] << "\n Completed "
-                 << OPS_COUNTER << " operations\n";
+                << OPS_COUNTER << " operations\n";
             return 0;
         }
     }
@@ -321,10 +310,10 @@ int main() {
     pthread_t tid[threads];
     for (int i = 0; i < threads; i++)
     {
-    	tid[i] = i;
+        tid[i] = i;
         pthread_create(&tid[i], NULL, myThreadFun, (void *)&tid[i]);
     }
     for(int i=0;i<threads;i++)
-    	pthread_join(tid[i],NULL);
+        pthread_join(tid[i],NULL);
     return 0;
 }
