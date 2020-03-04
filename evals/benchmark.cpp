@@ -50,7 +50,7 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 100000;
+const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 0;
 const long CLOCKS_PER_SECOND = 1000000;
 const uint key_size = 64, val_size = 255;
 
@@ -66,29 +66,21 @@ uint OPS_COUNTER = 0;
  * MODIFIED
  * Commented out this useless function
  */
-void *myThreadFun(void *vargp)
-{
+void *myThreadFun(void *vargp) {
 	int transactions=0;
 	clock_t start = clock();
 	int time = 10;
 	clock_t tt = clock();
-	while((float(tt-start)/CLOCKS_PER_SECOND)<=time)
-	{
-
-		for(int i=0;i<10000;i++)
-		{
+	while((float(tt-start)/CLOCKS_PER_SECOND)<=time) {
+		for(int i=0;i<10000;i++) {
 			transactions+=1;
-			int x = rand()%3;
-            cout<<DESCRIPTION[x]<<endl;
-			if(x==0)
-			{
+			int x = rand() % 5;
+			if(x==0) {
 				string key = random_key(rand()%key_size + 1);
 				Slice s_key,s_value;
 				strToSlice(key,s_key);
 				bool ans = kv.get(s_key,s_value);
-			}
-			else if(x==1)
-			{
+			} else if(x==1) {
 				string key = random_key(rand()%key_size + 1);
 				string value = random_value(rand()%255 + 1);
 				Slice s_key,s_value,temp;
@@ -100,9 +92,7 @@ void *myThreadFun(void *vargp)
 
 				if(check == false)
 					db_size++;
-			}
-			else if(x==2)
-			{
+			} else if(x==2) {
 				int temp=db_size;
 				if (temp == 0)
 					continue;
@@ -111,18 +101,14 @@ void *myThreadFun(void *vargp)
 				bool check = kv.get(rem,s_key,s_value);
 				check = kv.del(s_key);
 				db_size--;
-			}
-			else if(x==3)
-			{
+			} else if(x==3) {
 				int temp=db_size;
 				if (temp == 0)
 					continue;
 				int rem = rand()%temp;
 				Slice s_key,s_value;
 				bool check = kv.get(rem,s_key,s_value);
-			}
-			else if(x==4)
-			{
+			} else if(x==4) {
 				int temp=db_size;
 				if (temp == 0)
 					continue;
@@ -133,6 +119,7 @@ void *myThreadFun(void *vargp)
 		}
 		tt=clock();
 	}
+
 	cout<<transactions/time<<endl;
 	return NULL;
 }
@@ -328,7 +315,7 @@ int main() {
      * MODIFIED
      * Commented out till the end
      */
-    int threads = 0;
+    int threads = 4;
 
     pthread_t tid[threads];
     for (int i = 0; i < threads; i++)
