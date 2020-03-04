@@ -3,67 +3,144 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// void *makeTrieNode() {
-//     p = malloc();
-//     p->
-// }
+#define TRIE_LIST_SIZE 8000000
+#define TRIE_ARRAY_SIZE 52
+
+#define SLICE_LIST_SIZE 0
 
 struct Slice {
-   public:
     uint8_t size;
     char *data;
+};
 
-    Slice() {
-    }
-
-    Slice(string a) {
-        size = a.length();
-        // cout << to_string(size) << " " << a.length() << '\n';
-        data = (char *)malloc(a.length());
-        memcpy(data, a.data(), a.length());
-    }
+struct TrieNode {
+    char letter;
+    void *arr[52];
+    Slice *value;
+    int children;
+    Slice *word_span;
+    int left, right;  // (both inclusive)
 };
 
 class Trie {
-    struct TrieNode {
-        char letter;
-        // map<char, void *> mp;
-        void *arr[52];
-        Slice *value;
-        int children;
-        Slice *word_span;
-        int left, right;  // (both inclusive)
-    };
 
    public:
-    TrieNode *root = (TrieNode *)malloc(sizeof(TrieNode));
-    Trie() {
-        root->letter = '&';
-        root->children = 0;
-        for (int i = 0; i < 52; i++) {
-            root->arr[i] = NULL;
+
+    TrieNode *root;
+    TrieNode *freeTrieList;
+    Slice *freeSliceList;
+
+    TrieNode* getTrieNode() {
+        
+        TrieNode *temp;
+
+        if(freeTrieList) {
+            temp = freeTrieList;
+            freeTrieList = (TrieNode *) freeTrieList->value;
+        } else {
+            temp = (TrieNode *)malloc(sizeof(TrieNode));
         }
-        root->value = NULL;
+
+        temp->left = temp->right = 0;
+        temp->children = 0;
+        temp->word_span = NULL;
+        temp->value = NULL;
+        
+        for(register int i=0; i<TRIE_ARRAY_SIZE; i++)
+            temp->arr[i] = NULL;
+
+        return temp;
     }
 
-    // void delete_recursive(TrieNode *node) {
-    //     if (node == NULL)
-    //         return;
+    void freeTrieNode(TrieNode *node) {
+        node->value = (Slice *) freeTrieList;
+        freeTrieList = node;
+    }
 
-    //     for (int i = 0; i < 52; i++)
-    //         if (node->arr[i] != NULL)
-    //             delete_recursive((TrieNode *)node->arr[i]);
+    Slice* getSlice() {
+        
+        Slice *temp;
 
-    //     free(node);
-    // }
+        if(freeSliceList) {
+            temp = freeSliceList;
+            freeSliceList = (Slice *) freeSliceList->data;
+        } else {
+            temp = (Slice *)malloc(sizeof(Slice));
+        }
 
-    // ~Trie() {
-    //     delete_recursive(root);
-    // }
+        temp->size = 0;
+        temp->data = NULL;
+
+        return temp;
+    }
+
+    void freeSlice(Slice *node) {
+        node->data = (char *) freeSliceList;
+        freeSliceList = node;
+    }
+
+    Trie() {
+
+        // Initialize the TrieNodeBlock (the list of memory blocks)
+        freeTrieList = (TrieNode *)malloc(sizeof(TrieNode));
+        freeTrieList->value = NULL;
+
+        // Generate the entire free list
+        for(int i=0; i<TRIE_LIST_SIZE; i++) {
+            TrieNode *temp = (TrieNode *)malloc(sizeof(TrieNode));
+            temp->value = (Slice *) freeTrieList;
+            freeTrieList = temp;
+        }
+    
+        freeSliceList = (Slice *)malloc(sizeof(Slice));
+        freeSliceList->data = NULL;
+
+        for(int i=0; i<SLICE_LIST_SIZE; i++) {
+            Slice *temp = (Slice *)malloc(sizeof(Slice));
+            temp->data = (char *) freeSliceList;
+            freeSliceList = temp;
+        }
+
+        root = getTrieNode();
+        root->letter = '&';
+   }
+
+    void delete_recursive(TrieNode *root_node)
+    {
+        if(root_node) {
+            if(root_node->value->data)
+                free(root_node->value->data);
+            if(root_node->word_span->data)
+                free(root_node->word_span->data);
+            
+            for(int i=0; i<TRIE_ARRAY_SIZE; i++) 
+                delete_recursive((TrieNode *)root_node->arr[i]);
+
+            free(root_node);
+        }
+    }
+
+    ~Trie() {
+
+        for(TrieNode *block = freeTrieList; block!=NULL; ) {
+            TrieNode *temp = block;
+            block = (TrieNode *) block->value;
+            free(temp);
+        }
+
+        int i=0;
+        for(Slice *block = freeSliceList; block!=NULL; ) {
+            Slice *temp = block;
+            block = (Slice *) block->data;
+            free(temp);
+        }
+        
+        delete_recursive(root);
+    }
 
     bool red_children(Slice &key) {
         // cout << key.data << '\n';
-        Slice *new_key = (Slice *)malloc(sizeof(Slice));
+        Slice *new_key = getSlice();
         new_key->size = key.size;
         new_key->data = (char *)malloc(sizeof(char) * key.size);
         for (int i = 0; i < key.size; i++) {
@@ -103,48 +180,58 @@ class Trie {
     }
 
     bool insert(Slice &key, Slice &value) {
-        // cout << key.data << '\n';
-        Slice *new_key = (Slice *)malloc(sizeof(Slice));
+        Slice *new_key = getSlice();
         new_key->size = key.size;
         new_key->data = (char *)malloc(sizeof(char) * key.size);
+        
         for (int i = 0; i < key.size; i++) {
             new_key->data[i] = key.data[i];
         }
+
         int len = 0;
         TrieNode *curr = root;
+        
         while (curr != NULL) {
             curr->children++;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                                              : key.data[len] - 65;
                 if (curr->arr[x] == NULL) {
-                    TrieNode *new_node = (TrieNode *)malloc(sizeof(TrieNode));
+                    TrieNode *new_node = getTrieNode();
                     new_node->letter = key.data[len];
                     new_node->word_span = new_key;
                     new_node->left = len;
                     new_node->right = (int)key.size - 1;
                     new_node->children = 1;
+                    
                     for (int i = 0; i < 52; i++) {
                         new_node->arr[i] = NULL;
                     }
-                    new_node->value = (Slice *)malloc(sizeof(Slice));
+
+                    new_node->value = getSlice();
+
                     new_node->value->size = value.size;
-                    new_node->value->data =
-                        (char *)malloc(sizeof(char) * value.size);
+                    new_node->value->data = (char *)malloc(sizeof(char) * value.size);
+
                     for (int j = 0; j < value.size; j++) {
                         new_node->value->data[j] = value.data[j];
                     }
                     curr->arr[x] = new_node;
                     return 0;
                 }
+
                 curr = (TrieNode *)curr->arr[x];
+                
                 Slice *pp = curr->word_span;
+                
                 int iter = curr->left;
+                
                 while (iter <= curr->right && len < (int)key.size &&
                        pp->data[iter] == key.data[len]) {
                     len++;
                     iter++;
                 }
+                
                 if (len != (int)key.size) {
                     if (iter == curr->right + 1) {
                         continue;
@@ -152,7 +239,7 @@ class Trie {
                         // split here
                         // cout << key.data << " yo im " << '\n';
                         // view_all(0, root);
-                        TrieNode *y = (TrieNode *)malloc(sizeof(TrieNode));
+                        TrieNode *y = getTrieNode();
                         y->value = curr->value;
                         y->right = curr->right;
                         y->left = iter;
@@ -174,8 +261,7 @@ class Trie {
                         curr->children++;
 
                         // view_all(0, root);
-                        TrieNode *new_node =
-                            (TrieNode *)malloc(sizeof(TrieNode));
+                        TrieNode *new_node = getTrieNode();
                         new_node->letter = key.data[len];
                         new_node->word_span = new_key;
                         new_node->left = len;
@@ -184,7 +270,7 @@ class Trie {
                         for (int i = 0; i < 52; i++) {
                             new_node->arr[i] = NULL;
                         }
-                        new_node->value = (Slice *)malloc(sizeof(Slice));
+                        new_node->value = getSlice();
                         new_node->value->size = value.size;
                         new_node->value->data =
                             (char *)malloc(sizeof(char) * value.size);
@@ -200,7 +286,7 @@ class Trie {
                     if (iter == curr->right + 1)
                         continue;
                     else {
-                        TrieNode *y = (TrieNode *)malloc(sizeof(TrieNode));
+                        TrieNode *y = getTrieNode();
                         y->value = curr->value;
                         y->right = curr->right;
                         y->left = iter;
@@ -228,7 +314,7 @@ class Trie {
                 if (curr->value == NULL)
                     rv = 0;
                 // curr->value.data = value.data;
-                curr->value = (Slice *)malloc(sizeof(Slice));
+                curr->value = getSlice();
                 curr->value->size = value.size;
                 curr->value->data = (char *)malloc(sizeof(char) * value.size);
                 for (int j = 0; j < value.size; j++) {
