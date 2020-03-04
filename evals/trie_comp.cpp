@@ -526,13 +526,11 @@ class Trie {
             } else if (len == key.size) {
                 if(curr->value == NULL) {
                     pthread_rwlock_unlock(&(curr->lock));
-                    pthread_rwlock_unlock(&(old_curr->lock));
                     return 0;
                 } else {
                     free(curr->value->data);
                     free(curr->value);
                     pthread_rwlock_unlock(&(curr->lock));
-                    pthread_rwlock_unlock(&(old_curr->lock));
                     curr->value = NULL;
                     return 1;
                 }
@@ -550,17 +548,25 @@ class Trie {
         TrieNode *curr = root;
         while (curr != NULL) {
             // cout << curr->children << endl;
+            TrieNode * oldcuRR =curr;
+            pthread_rwlock_rdlock(&(curr->lock));
             if (curr->children < n) {
+                pthread_rwlock_unlock(&(curr->lock));
                 return 0;
             }
             if (curr->children == 1) {
                 while (curr->value == NULL) {
                     for (int j = 0; j < 52; j++) {
                         if (curr->arr[j] != NULL) {
+                            TrieNode * old_curr = curr;
                             curr = (TrieNode *)curr->arr[j];
+                            pthread_rwlock_rdlock(&(curr->lock));
+                            pthread_rwlock_rdlock(&(curr->word_span->lock));
                             for (int i = curr->left; i <= curr->right; i++) {
                                 s += curr->word_span->data[i];
                             }
+                            pthread_rwlock_unlock(&(curr->word_span->lock));
+                            // pthread_rwlock_unlock(&(curr->lock));
                             break;
                         }
                     }
@@ -571,6 +577,7 @@ class Trie {
                 for (int i = 0; i < value.size; i++) {
                     value.data[i] = curr->value->data[i];
                 }
+                pthread_rwlock_unlock(&(oldcuRR->lock));
                 return 1;
             }
             if (n == 1 && curr->value != NULL) {
@@ -580,6 +587,7 @@ class Trie {
                 for (int i = 0; i < value.size; i++) {
                     value.data[i] = curr->value->data[i];
                 }
+                pthread_rwlock_unlock(&(oldcuRR->lock));
                 return 1;
             }
             if (curr->value != NULL)
@@ -587,18 +595,25 @@ class Trie {
             for (int j = 0; j < 52; j++) {
                 if (curr->arr[j] != NULL) {
                     TrieNode *p = (TrieNode *)curr->arr[j];
+                    pthread_rwlock_rdlock(&(p->lock));
+                    pthread_rwlock_rdlock(&(p->word_span->lock));
                     if (p->children >= n) {
                         // s += (j >= 26) ? j + 97 - 26 : j + 65;
                         for (int i = p->left; i <= p->right; i++) {
                             s += p->word_span->data[i];
                         }
                         curr = p;
+                        pthread_rwlock_unlock(&(p->word_span->lock));
+                        pthread_rwlock_unlock(&(p->lock));
                         break;
                     } else {
                         n -= p->children;
+                        pthread_rwlock_unlock(&(p->word_span->lock));
+                        pthread_rwlock_unlock(&(p->lock));
                     }
                 }
             }
+            pthread_rwlock_unlock(&(oldcuRR->lock));
         }
         // cur.arr['a'] = &cur;
         // cout << endl;
