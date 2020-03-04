@@ -165,7 +165,7 @@ class Trie {
             new_key->data[i] = key.data[i];
         }
         int len = 0;
-        register TrieNode *curr = root;
+        TrieNode *curr = root;
         while (curr != NULL) {
             curr->children--;
             if (len < key.size) {
@@ -466,7 +466,7 @@ class Trie {
         n++;
         string s;
         int len = 0;
-        register TrieNode *curr = root;
+        TrieNode *curr = root;
         while (curr != NULL) {
             // cout << curr->children << endl;
             if (curr->children < n) {
@@ -521,6 +521,12 @@ class Trie {
         }
         // cur.arr['a'] = &cur;
         // cout << endl;
+    }
+
+    bool del_N(int n) {
+        Slice a, b;
+        get_val_N(n, a, b);
+        del(a);
     }
 
     void view_all(int depth, TrieNode *curr) {
