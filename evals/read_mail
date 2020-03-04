@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source ./creds.env
+
+curl -u placeholder.name.spoop@gmail.com:"$PASSWORD" -silent "https://mail.google.com/mail/feed/atom" | tr -d '\n' | sed 's:</entry>:\n:g' | sed -n 's/.*<title>\(.*\)<\/title.*<summary>\([^<]*\).*message_id=\([^&]*\).*<author><name>\([^<]*\)<\/name><email>\([^<]*\).*/ID: \3\nFrom: \4 [\5] \nSubject: \1\nMessage: \2\n/p' | perl -MHTML::Entities -pe 'decode_entities($_);'
