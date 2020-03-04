@@ -50,7 +50,7 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 1000000, NUM_OPS = 0;
+const uint MAX_KEYS = 10000000, INSERTS = 100, NUM_OPS = 0;
 const long CLOCKS_PER_SECOND = 1000000;
 const uint key_size = 64, val_size = 255;
 
@@ -305,7 +305,8 @@ int main() {
      * MODIFIED
      * Commented out till the end
      */
-    int threads = 4;
+    // int threads = 4;
+    int threads = 1;
 
     pthread_t tid[threads];
     for (int i = 0; i < threads; i++)
