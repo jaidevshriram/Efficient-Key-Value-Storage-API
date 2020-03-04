@@ -141,20 +141,20 @@ class Trie {
         printf("Missed Trie Allocations: %d\n", missedFreeTrieNode);
         printf("Missed Slice Allocations: %d\n", missedFreeSlice);
 
-        for(TrieNode *block = freeTrieList; block!=NULL; ) {
-            TrieNode *temp = block;
-            block = (TrieNode *) block->value;
-            free(temp);
-        }
+        // for(TrieNode *block = freeTrieList; block!=NULL; ) {
+        //     TrieNode *temp = block;
+        //     block = (TrieNode *) block->value;
+        //     free(temp);
+        // }
 
-        int i=0;
-        for(Slice *block = freeSliceList; block!=NULL; ) {
-            Slice *temp = block;
-            block = (Slice *) block->data;
-            free(temp);
-        }
+        // int i=0;
+        // for(Slice *block = freeSliceList; block!=NULL; ) {
+        //     Slice *temp = block;
+        //     block = (Slice *) block->data;
+        //     free(temp);
+        // }
         
-        delete_recursive(root);
+        // delete_recursive(root);
     }
 
     bool red_children(Slice &key) {
