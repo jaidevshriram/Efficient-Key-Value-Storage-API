@@ -39,6 +39,7 @@ class Trie {
     TrieNode *freeTrieList;
     Slice *freeSliceList;
     int missedFreeTrieNode;
+    int missedFreeSlice;
 
     TrieNode* getTrieNode() {
         
@@ -76,6 +77,7 @@ class Trie {
             temp = freeSliceList;
             freeSliceList = (Slice *) freeSliceList->data;
         } else {
+            missedFreeSlice++;
             temp = (Slice *)malloc(sizeof(Slice));
         }
 
@@ -136,7 +138,8 @@ class Trie {
 
     ~Trie() {
 
-        printf("Missed allocations: %d\n", missedFreeTrieNode);
+        printf("Missed Trie Allocations: %d\n", missedFreeTrieNode);
+        printf("Missed Slice Allocations: %d\n", missedFreeSlice);
 
         for(TrieNode *block = freeTrieList; block!=NULL; ) {
             TrieNode *temp = block;
