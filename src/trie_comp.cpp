@@ -566,7 +566,7 @@ class Trie {
                                 s += curr->word_span->data[i];
                             }
                             pthread_rwlock_unlock(&(curr->word_span->lock));
-                            pthread_rwlock_unlock(&(curr->lock));
+                            // pthread_rwlock_unlock(&(curr->lock));
                             break;
                         }
                     }
@@ -577,7 +577,7 @@ class Trie {
                 for (int i = 0; i < value.size; i++) {
                     value.data[i] = curr->value->data[i];
                 }
-                pthread_rwlock_unlock(&(curr->lock));
+                pthread_rwlock_unlock(&(oldcuRR->lock));
                 return 1;
             }
             if (n == 1 && curr->value != NULL) {
@@ -587,7 +587,7 @@ class Trie {
                 for (int i = 0; i < value.size; i++) {
                     value.data[i] = curr->value->data[i];
                 }
-                pthread_rwlock_unlock(&(curr->lock));
+                pthread_rwlock_unlock(&(oldcuRR->lock));
                 return 1;
             }
             if (curr->value != NULL)
@@ -603,11 +603,13 @@ class Trie {
                             s += p->word_span->data[i];
                         }
                         curr = p;
-                        pthread_rwlock_unlock(&(curr->lock));
-                        pthread_rwlock_unlock(&(curr->word_span->lock));
+                        pthread_rwlock_unlock(&(p->word_span->lock));
+                        pthread_rwlock_unlock(&(p->lock));
                         break;
                     } else {
                         n -= p->children;
+                        pthread_rwlock_unlock(&(p->word_span->lock));
+                        pthread_rwlock_unlock(&(p->lock));
                     }
                 }
             }
