@@ -9,7 +9,7 @@ function backup {
 
 function restore {
     echo "Restoring kvStore..."
-    cp kvStore.cpp.bak kvStore.cpp
+    mv kvStore.cpp.bak kvStore.cpp
 }
 
 backup
