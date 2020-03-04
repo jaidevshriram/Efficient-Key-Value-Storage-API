@@ -78,7 +78,7 @@ void *myThreadFun(void *vargp)
 		for(int i=0;i<10000;i++)
 		{
 			transactions+=1;
-			int x = rand()%4;
+			int x = rand()%5;
 			if(x==0)
 			{
 				string key = random_key(rand()%key_size + 1);

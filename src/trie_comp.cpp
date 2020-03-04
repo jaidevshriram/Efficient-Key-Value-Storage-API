@@ -470,48 +470,66 @@ class Trie {
         TrieNode *curr = root;
 
         while (curr != NULL) {
+            pthread_rwlock_wrlock(&(curr->lock));
             curr->children--;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                     : key.data[len] - 65;
                 if (curr->arr[x] == NULL) {
+                        pthread_rwlock_unlock(&trie_lock);
                     return 0;
                 }
                 // TODO: Review this please
                 TrieNode* newCurr = (TrieNode *) curr->arr[x];
+                pthread_rwlock_rdlock(&(((TrieNode *)curr->arr[x])->lock));
                 if(newCurr->children == 1) {
                     curr->arr[x] = NULL;
                     curr = newCurr;
+                    pthread_rwlock_unlock(&(((TrieNode *)curr->arr[x])->lock));
+                    pthread_rwlock_unlock(&trie_lock);
                     continue;
                 }
 
                 if(!curr->children) {
+                    pthread_rwlock_rdlock(&(((TrieNode *)curr->arr[x])->lock));
+
                     TrieNode *newCurr = (TrieNode *)curr->arr[x];
                     // TODO: FREE
+                    pthread_rwlock_unlock(&(curr->lock));
                     free(curr);
                     curr = newCurr;
                 } else {
+                    pthread_rwlock_unlock(&(curr->lock));
+                    pthread_rwlock_rdlock(&(curr->lock));
                     curr = (TrieNode *)curr->arr[x];
                 }
 
+                pthread_rwlock_rdlock(&(curr->word_span->lock));
                 Slice * pp = curr->word_span;
                 int iter = curr->left;
                 while(iter <= curr->right && len < (int)key.size && pp->data[iter] == key.data[len]) {
                     len++;
                     iter++;
                 }
+                pthread_rwlock_unlock(&(curr->word_span->lock));
                 if(iter > curr->right) {
+                    pthread_rwlock_unlock(&(curr->lock));
                     continue;
                 } else {
+                    pthread_rwlock_unlock(&(curr->lock));
                     return 0;
                 }
             } else if (len == key.size) {
                 if(curr->value == NULL) {
+                    pthread_rwlock_unlock(&(curr->lock));
                     return 0;
                 } else {
+                    pthread_rwlock_unlock(&(curr->value->lock));
                     free(curr->value->data);
                     free(curr->value);
                     curr->value = NULL;
+                    pthread_rwlock_unlock(&(curr->value->lock));
+                    pthread_rwlock_unlock(&(curr->lock));
                     return 1;
                 }
             }
