@@ -483,17 +483,18 @@ class Trie {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                     : key.data[len] - 65;
                 if (curr->arr[x] == NULL) {
+                    pthread_rwlock_unlock(&(curr->lock));
                     return 0;
                 }
 
                 // TODO: Review this please
                 TrieNode* newCurr = (TrieNode *) curr->arr[x];
-                pthread_rwlock_rdlock(&(newCurr->lock));
+                pthread_rwlock_wrlock(&(newCurr->lock));
                 TrieNode* old_curr = curr;
 
                 if(newCurr->children == 1) {
                     curr->arr[x] = NULL;
-                    TrieNode* old_curr = curr;
+                    // TrieNode* old_curr = curr;
                     curr = newCurr;
                     pthread_rwlock_unlock(&(newCurr->lock));
                     pthread_rwlock_unlock(&(old_curr->lock));
@@ -505,26 +506,33 @@ class Trie {
                 }
 
                 curr = (TrieNode *)curr->arr[x];
-
+                pthread_rwlock_rdlock(&(curr->word_span->lock));
                 Slice * pp = curr->word_span;
                 int iter = curr->left;
                 while(iter <= curr->right && len < (int)key.size && pp->data[iter] == key.data[len]) {
                     len++;
                     iter++;
                 }
+                pthread_rwlock_unlock(&(curr->word_span->lock));
                 if(iter > curr->right) {
+                    pthread_rwlock_unlock(&(curr->lock));
                     pthread_rwlock_unlock(&(old_curr->lock));
                     continue;
                 } else {
+                    pthread_rwlock_unlock(&(curr->lock));
                     pthread_rwlock_unlock(&(old_curr->lock));
                     return 0;
                 }
             } else if (len == key.size) {
                 if(curr->value == NULL) {
+                    pthread_rwlock_unlock(&(curr->lock));
+                    pthread_rwlock_unlock(&(old_curr->lock));
                     return 0;
                 } else {
                     free(curr->value->data);
                     free(curr->value);
+                    pthread_rwlock_unlock(&(curr->lock));
+                    pthread_rwlock_unlock(&(old_curr->lock));
                     curr->value = NULL;
                     return 1;
                 }
