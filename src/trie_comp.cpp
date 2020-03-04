@@ -1,12 +1,16 @@
+#pragma GCC optimization ("unroll-loops")
+#pragma GCC optimization ("O3")
+#pragma GCC target ("avx2")
+
 #include <iostream>
 #include <map>
 #include <bits/stdc++.h>
 using namespace std;
 
-#define TRIE_LIST_SIZE 0
+#define TRIE_LIST_SIZE 3500000
 #define TRIE_ARRAY_SIZE 52
 
-#define SLICE_LIST_SIZE 0
+#define SLICE_LIST_SIZE 6000000
 
 struct Slice {
     uint8_t size;
