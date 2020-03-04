@@ -15,7 +15,9 @@ function restore {
 backup
 cat trie_comp.cpp <( sed '1,3d' kvStore.cpp ) > kvStore.cpp
 
-zip "$ROLL.zip" kvStore.cpp && { echo "zipped files"; restore; } || { echo "Error in making zip"; restore; exit 1; }
+zip -FS "$ROLL.zip" kvStore.cpp || { echo "Error in making zip"; restore; exit 1; }
+echo "zipped files"
+restore
 
 echo "Generating mail..."
 mpack -s "$ROLL" -o mail ./2018101012_2018101019_2018111010_2018111022.zip || { echo "Error in generating mail"; exit 1; }
