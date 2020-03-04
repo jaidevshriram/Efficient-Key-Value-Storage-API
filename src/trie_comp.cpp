@@ -12,6 +12,7 @@ using namespace std;
 struct Slice {
     uint8_t size;
     char *data;
+    pthread_rwlock_t lock;
 
     Slice() {
     }
@@ -39,6 +40,8 @@ class Trie {
 
     TrieNode *root;
     TrieNode *freeTrieList;
+    pthread_rwlock_t trie_lock;
+    pthread_rwlock_t slice_lock;
     Slice *freeSliceList;
     int missedFreeTrieNode;
 
@@ -46,6 +49,7 @@ class Trie {
         
         TrieNode *temp;
 
+        pthread_rwlock_wrlock(&trie_lock);
         if(freeTrieList) {
             temp = freeTrieList;
             freeTrieList = (TrieNode *) freeTrieList->value;
@@ -54,6 +58,7 @@ class Trie {
             temp = (TrieNode *)malloc(sizeof(TrieNode));
             pthread_rwlock_init(&(temp->lock), NULL);
         }
+        pthread_rwlock_unlock(&trie_lock);
 
         temp->left = temp->right = 0;
         temp->children = 0;
@@ -67,20 +72,25 @@ class Trie {
     }
 
     void freeTrieNode(TrieNode *node) {
+        pthread_rwlock_wrlock(&trie_lock);
         node->value = (Slice *) freeTrieList;
         freeTrieList = node;
+        pthread_rwlock_unlock(&trie_lock);
     }
 
     Slice* getSlice() {
         
         Slice *temp;
-
+        
+        pthread_rwlock_wrlock(&slice_lock);
         if(freeSliceList) {
             temp = freeSliceList;
             freeSliceList = (Slice *) freeSliceList->data;
         } else {
             temp = (Slice *)malloc(sizeof(Slice));
+            pthread_rwlock_init(&(temp->lock), NULL);
         }
+        pthread_rwlock_unlock(&slice_lock);
 
         temp->size = 0;
         temp->data = NULL;
@@ -89,13 +99,18 @@ class Trie {
     }
 
     void freeSlice(Slice *node) {
+        pthread_rwlock_wrlock(&slice_lock);
         node->data = (char *) freeSliceList;
         freeSliceList = node;
+        pthread_rwlock_unlock(&slice_lock);
     }
 
     Trie() {
 
         missedFreeTrieNode = 0;
+
+        pthread_rwlock_init(&trie_lock, NULL);
+        pthread_rwlock_init(&slice_lock, NULL);
 
         // Initialize the TrieNodeBlock (the list of memory blocks)
         freeTrieList = (TrieNode *)malloc(sizeof(TrieNode));
@@ -116,6 +131,7 @@ class Trie {
         for(int i=0; i<SLICE_LIST_SIZE; i++) {
             Slice *temp = (Slice *)malloc(sizeof(Slice));
             temp->data = (char *) freeSliceList;
+            pthread_rwlock_init(&(temp->lock), NULL);
             freeSliceList = temp;
         }
 
@@ -143,20 +159,20 @@ class Trie {
 
         printf("Missed allocations: %d\n", missedFreeTrieNode);
 
-        for(TrieNode *block = freeTrieList; block!=NULL; ) {
-            TrieNode *temp = block;
-            block = (TrieNode *) block->value;
-            free(temp);
-        }
+        // for(TrieNode *block = freeTrieList; block!=NULL; ) {
+        //     TrieNode *temp = block;
+        //     block = (TrieNode *) block->value;
+        //     free(temp);
+        // }
 
-        int i=0;
-        for(Slice *block = freeSliceList; block!=NULL; ) {
-            Slice *temp = block;
-            block = (Slice *) block->data;
-            free(temp);
-        }
+        // int i=0;
+        // for(Slice *block = freeSliceList; block!=NULL; ) {
+        //     Slice *temp = block;
+        //     block = (Slice *) block->data;
+        //     free(temp);
+        // }
         
-        delete_recursive(root);
+        // delete_recursive(root);
     }
 
     bool red_children(Slice &key) {
@@ -182,6 +198,7 @@ class Trie {
                 TrieNode *old_curr = curr;
                 curr = (TrieNode *)curr->arr[x];
                 pthread_rwlock_rdlock(&(curr->lock));
+                pthread_rwlock_wrlock(&(curr->word_span->lock));
                 Slice *pp = curr->word_span;
                 int iter = curr->left;
                 while (iter <= curr->right && len < (int)key.size &&
@@ -189,6 +206,7 @@ class Trie {
                     len++;
                     iter++;
                 }
+                pthread_rwlock_unlock(&(curr->word_span->lock));
                 if (len != key.size) {
                     if (iter == curr->right + 1) {
                         pthread_rwlock_unlock(&(curr->lock));
@@ -223,7 +241,7 @@ class Trie {
         
         while (curr != NULL) {
             // cout << "insert aquiring lock"<< endl;
-            pthread_rwlock_wrlock(&(curr->lock));
+            int test = pthread_rwlock_wrlock(&(curr->lock));
             curr->children++;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
