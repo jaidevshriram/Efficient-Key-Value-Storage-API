@@ -50,7 +50,7 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 0;
+const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 1000000;
 const long CLOCKS_PER_SECOND = 1000000;
 const uint key_size = 64, val_size = 255;
 
