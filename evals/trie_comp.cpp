@@ -422,6 +422,7 @@ class Trie {
                 }
                 // TODO: Review this please
                 TrieNode* newCurr = (TrieNode *) curr->arr[x];
+
                 if(newCurr->children == 1) {
                     curr->arr[x] = NULL;
                     curr = newCurr;
@@ -429,13 +430,10 @@ class Trie {
                 }
 
                 if(!curr->children) {
-                    TrieNode *newCurr = (TrieNode *)curr->arr[x];
-                    // TODO: FREE
                     free(curr);
-                    curr = newCurr;
-                } else {
-                    curr = (TrieNode *)curr->arr[x];
                 }
+
+                curr = newCurr;
 
                 Slice * pp = curr->word_span;
                 int iter = curr->left;
