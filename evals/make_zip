@@ -1,3 +1,0 @@
-#!/bin/bash
-
-zip 2018101012_2018101019_2018111010_2018111022.zip trie_comp.cpp kvStore.cpp
