@@ -485,27 +485,27 @@ class Trie {
                 if (curr->arr[x] == NULL) {
                     return 0;
                 }
+
                 // TODO: Review this please
                 TrieNode* newCurr = (TrieNode *) curr->arr[x];
                 pthread_rwlock_rdlock(&(newCurr->lock));
                 TrieNode* old_curr = curr;
+
                 if(newCurr->children == 1) {
                     curr->arr[x] = NULL;
                     TrieNode* old_curr = curr;
                     curr = newCurr;
                     pthread_rwlock_unlock(&(newCurr->lock));
-                     pthread_rwlock_unlock(&(old_curr->lock));
+                    pthread_rwlock_unlock(&(old_curr->lock));
                     continue;
                 }
 
                 if(!curr->children) {
-                    TrieNode *newCurr = (TrieNode *)curr->arr[x];
-                    // TODO: FREE
                     free(curr);
-                    curr = newCurr;
-                } else {
-                    curr = (TrieNode *)curr->arr[x];
                 }
+
+                curr = (TrieNode *)curr->arr[x];
+
                 Slice * pp = curr->word_span;
                 int iter = curr->left;
                 while(iter <= curr->right && len < (int)key.size && pp->data[iter] == key.data[len]) {
