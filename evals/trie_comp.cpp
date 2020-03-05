@@ -430,7 +430,7 @@ class Trie {
                 }
 
                 if(!curr->children) {
-                    free(curr);
+                    freeTrieNode(curr);
                 }
 
                 curr = newCurr;
@@ -451,7 +451,7 @@ class Trie {
                     return 0;
                 } else {
                     free(curr->value->data);
-                    free(curr->value);
+                    freeSlice(curr->value);
                     curr->value = NULL;
                     return 1;
                 }
