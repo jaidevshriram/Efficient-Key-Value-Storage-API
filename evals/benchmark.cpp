@@ -313,7 +313,7 @@ int main() {
         }
 
         //  printf("\r%8d", i);
-        printf("\n%8d %10s::%Lfs", i, DESCRIPTION[x].c_str(), total);
+        printf("\033[0m%8d %10s::%Lfs\n", i, DESCRIPTION[x].c_str(), total);
 
         if (incorrect == true) {
             cout << "\rError in operation " << DESCRIPTION[x] << "\n Completed "
