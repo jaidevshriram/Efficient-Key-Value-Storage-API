@@ -38,6 +38,14 @@ class kvStore {
     }
 
     bool del(Slice &key) {
+        Slice value;
+
+        pthread_rwlock_rdlock(&lock);
+        bool exists = db.get_val(key, value);
+        pthread_rwlock_unlock(&lock);
+
+        if(!exists) return false;
+
         pthread_rwlock_wrlock(&lock);
         bool ret = db.del(key);
         pthread_rwlock_unlock(&lock);
@@ -56,11 +64,16 @@ class kvStore {
     bool del(int N) {
         Slice key, value;
 
-        pthread_rwlock_wrlock(&lock);
-        db.get_val_N(N, key, value);
+        pthread_rwlock_rdlock(&lock);
+        bool exists = db.get_val_N(N, key, value);
         pthread_rwlock_unlock(&lock);
 
-        db.del(key);
-        return true;
+        if(!exists) return false;
+
+        pthread_rwlock_wrlock(&lock);
+        bool ret = db.del(key);
+        pthread_rwlock_unlock(&lock);
+
+        return ret;
     }
 };

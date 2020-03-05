@@ -66,29 +66,22 @@ uint OPS_COUNTER = 0;
  * MODIFIED
  * Commented out this useless function
  */
-void *myThreadFun(void *vargp)
-{
+void *myThreadFun(void *vargp) {
 	int transactions=0;
 	clock_t start = clock();
 	int time = 10;
 	clock_t tt = clock();
-	while((float(tt-start)/CLOCKS_PER_SECOND)<=time)
-	{
-
-		for(int i=0;i<10000;i++)
-		{
+	while((float(tt-start)/CLOCKS_PER_SECOND)<=time) {
+		for(int i=0;i<10000;i++) {
 			transactions+=1;
-			int x = rand()%3;
-            // printf("\r %s", DESCRIPTION[x]);
-			if(x==0)
-			{
+
+			int x = rand() % 5;
+			if(x==0) {
 				string key = random_key(rand()%key_size + 1);
 				Slice s_key,s_value;
 				strToSlice(key,s_key);
 				bool ans = kv.get(s_key,s_value);
-			}
-			else if(x==1)
-			{
+			} else if(x==1) {
 				string key = random_key(rand()%key_size + 1);
 				string value = random_value(rand()%255 + 1);
 				Slice s_key,s_value,temp;
@@ -100,9 +93,7 @@ void *myThreadFun(void *vargp)
 
 				if(check == false)
 					db_size++;
-			}
-			else if(x==2)
-			{
+			} else if(x==2) {
 				int temp=db_size;
 				if (temp == 0)
 					continue;
@@ -111,18 +102,14 @@ void *myThreadFun(void *vargp)
 				bool check = kv.get(rem,s_key,s_value);
 				check = kv.del(s_key);
 				db_size--;
-			}
-			else if(x==3)
-			{
+			} else if(x==3) {
 				int temp=db_size;
 				if (temp == 0)
 					continue;
 				int rem = rand()%temp;
 				Slice s_key,s_value;
 				bool check = kv.get(rem,s_key,s_value);
-			}
-			else if(x==4)
-			{
+			} else if(x==4) {
 				int temp=db_size;
 				if (temp == 0)
 					continue;
@@ -133,6 +120,7 @@ void *myThreadFun(void *vargp)
 		}
 		tt=clock();
 	}
+
 	cout<<transactions/time<<endl;
 	return NULL;
 }

@@ -407,8 +407,7 @@ class Trie {
 
     bool del(Slice &key) {
         Slice v;
-        if (!get_val(key, v))
-            return 0;
+
         int len = 0;
         TrieNode *curr = root;
 
