@@ -1,4 +1,4 @@
-#define NTRIES 1
+#define NTRIES 20
 
 #include <bits/stdc++.h>
 #include "trie_comp.cpp"
@@ -8,7 +8,7 @@ using namespace std;
 
 class kvStore {
     uint64_t maxSize;
-    pthread_rwlock_t lock;
+    pthread_rwlock_t lock[NTRIES];
     Trie db[NTRIES];
     // uint children[NTRIES];
     uint bucketSize;
@@ -16,15 +16,19 @@ class kvStore {
    public:
     kvStore(uint64_t maxSize) {
         this->maxSize = maxSize;
-        pthread_rwlock_init(&lock, NULL);
+        for(int i = 0; i < NTRIES; i++)
+            pthread_rwlock_init(&(lock[i]), NULL);
         bucketSize = (52 / NTRIES) + 1;
     }
 
     bool get(Slice &key, Slice &value) {
         // cout << "GET\n";
-        pthread_rwlock_wrlock(&lock);
-        bool ret = db[getIndex(key.data[0])].get_val(key, value);
-        pthread_rwlock_unlock(&lock);
+
+        int index = getIndex(key.data[0]);
+
+        pthread_rwlock_wrlock(&(lock[index]));
+        bool ret = db[index].get_val(key, value);
+        pthread_rwlock_unlock(&(lock[index]));
 
         return ret;
     }
@@ -33,9 +37,9 @@ class kvStore {
         // cout << "PUT\n";
         uint index = getIndex(key.data[0]);
 
-        pthread_rwlock_wrlock(&lock);
+        pthread_rwlock_wrlock(&(lock[index]));
         bool ret = db[index].insert(key, value);
-        pthread_rwlock_unlock(&lock);
+        pthread_rwlock_unlock(&(lock[index]));
 
         return ret;
     }
@@ -49,36 +53,43 @@ class kvStore {
 
         uint index = getIndex(key.data[0]);
 
-        pthread_rwlock_wrlock(&lock);
+        pthread_rwlock_rdlock(&(lock[index]));
         bool exists = db[index].get_val(key, value);
-        // pthread_rwlock_unlock(&lock);
+        pthread_rwlock_unlock(&(lock[index]));
 
-        if (!exists)
+        if (!exists) {
             return false;
+        }
 
-        // pthread_rwlock_wrlock(&lock);
+        pthread_rwlock_wrlock(&(lock[index]));
         bool ret = db[index].del(key);
-        pthread_rwlock_unlock(&lock);
+        pthread_rwlock_unlock(&(lock[index]));
 
         return ret;
     }
 
     bool get(int N, Slice &key, Slice &value) {
         // cout << "GET N\n";
-        pthread_rwlock_wrlock(&lock);
         int index = 0;
         int ncp = N;
 
         for (int i = 0; i < NTRIES; i++) {
+            pthread_rwlock_rdlock(&(lock[i]));
             int ch = db[i].root->children;
             if (ch > ncp)
                 break;
             ncp -= ch;
             index++;
+            pthread_rwlock_unlock(&(lock[i]));
         }
+
+        if(index >= NTRIES) {
+            return false;
+        }
+
         // cout << index << " " << ncp << '\n';
         db[index].get_val_N(ncp, key, value);
-        pthread_rwlock_unlock(&lock);
+        pthread_rwlock_unlock(&(lock[index]));
 
         return true;
     }
@@ -87,38 +98,35 @@ class kvStore {
         // cout << "DEL N\n";
         Slice key, value;
 
-        // string pr = "===" + to_string(N) + " [";
-
-        // for (int i = 0; i < NTRIES; i++)
-        //     pr += to_string(children[i]) + ", ";
-
-        pthread_rwlock_wrlock(&lock);
         int index = 0;
         int ncp = N;
 
         for (int i = 0; i < NTRIES; i++) {
+            pthread_rwlock_wrlock(&(lock[i]));
             int ch = db[i].root->children;
             if (ch > ncp)
                 break;
             ncp -= ch;
             index++;
+            pthread_rwlock_unlock(&(lock[i]));
         }
-        // pr += "] " + to_string(index) + " " + to_string(N) + "===";
 
-        // cout << pr << endl;
-
-        // cout << N << " " << index << " ++++ " << ncp << '\n';
-        bool exists = db[index].get_val_N(ncp, key, value);
-        // pthread_rwlock_unlock(&lock);
-
-        if (!exists)
+        if(index >= NTRIES) {
             return false;
+        }
+
+        bool exists = db[index].get_val_N(ncp, key, value);
+        pthread_rwlock_unlock(&(lock[index]));
+
+        if (!exists) {
+            return false;
+        }
 
         index = getIndex(key.data[0]);
 
-        // pthread_rwlock_wrlock(&lock);
+        pthread_rwlock_wrlock(&(lock[index]));
         bool ret = db[index].del(key);
-        pthread_rwlock_unlock(&lock);
+        pthread_rwlock_unlock(&(lock[index]));
 
         return ret;
     }

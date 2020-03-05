@@ -463,6 +463,9 @@ class Trie {
 
     bool get_val_N(int n, Slice &key, Slice &value) {
         n++;
+        if(n > root->children) {
+            return 0;
+        }
         string s;
         int len = 0;
         TrieNode *curr = root;
