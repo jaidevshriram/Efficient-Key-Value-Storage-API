@@ -50,7 +50,7 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 0;
+const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 100000;
 const long CLOCKS_PER_SECOND = 1000000;
 const uint key_size = 64, val_size = 255;
 
@@ -78,7 +78,8 @@ void *myThreadFun(void *vargp)
 		for(int i=0;i<10000;i++)
 		{
 			transactions+=1;
-			int x = rand()%5;
+			int x = rand()%3;
+            cout<<DESCRIPTION[x]<<endl;
 			if(x==0)
 			{
 				string key = random_key(rand()%key_size + 1);
@@ -327,7 +328,7 @@ int main() {
      * MODIFIED
      * Commented out till the end
      */
-    int threads = 4;
+    int threads = 0;
 
     pthread_t tid[threads];
     for (int i = 0; i < threads; i++)

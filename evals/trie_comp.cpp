@@ -198,7 +198,7 @@ class Trie {
                 TrieNode *old_curr = curr;
                 curr = (TrieNode *)curr->arr[x];
                 pthread_rwlock_rdlock(&(curr->lock));
-                pthread_rwlock_wrlock(&(curr->word_span->lock));
+                pthread_rwlock_rdlock(&(curr->word_span->lock));
                 Slice *pp = curr->word_span;
                 int iter = curr->left;
                 while (iter <= curr->right && len < (int)key.size &&
@@ -477,18 +477,21 @@ class Trie {
         TrieNode *curr = root;
 
         while (curr != NULL) {
+            cout<<"\033[0;32m Lock Obtained"<<endl;
             pthread_rwlock_wrlock(&(curr->lock));
             curr->children--;
             if (len < key.size) {
                 int x = (key.data[len] > 90) ? key.data[len] - 97 + 26
                     : key.data[len] - 65;
                 if (curr->arr[x] == NULL) {
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(curr->lock));
                     return 0;
                 }
 
                 // TODO: Review this please
                 TrieNode* newCurr = (TrieNode *) curr->arr[x];
+                cout<<"\033[0;32m Lock Obtained"<<endl;
                 pthread_rwlock_wrlock(&(newCurr->lock));
                 TrieNode* old_curr = curr;
 
@@ -496,7 +499,9 @@ class Trie {
                     curr->arr[x] = NULL;
                     // TrieNode* old_curr = curr;
                     curr = newCurr;
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(newCurr->lock));
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(old_curr->lock));
                     continue;
                 }
@@ -506,6 +511,7 @@ class Trie {
                 }
 
                 curr = (TrieNode *)curr->arr[x];
+                cout<<"\033[0;32m Lock Obtained"<<endl;
                 pthread_rwlock_rdlock(&(curr->word_span->lock));
                 Slice * pp = curr->word_span;
                 int iter = curr->left;
@@ -513,23 +519,30 @@ class Trie {
                     len++;
                     iter++;
                 }
+                cout<<"\033[1;31m Lock Released"<<endl;
                 pthread_rwlock_unlock(&(curr->word_span->lock));
                 if(iter > curr->right) {
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(curr->lock));
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(old_curr->lock));
                     continue;
                 } else {
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(curr->lock));
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(old_curr->lock));
                     return 0;
                 }
             } else if (len == key.size) {
                 if(curr->value == NULL) {
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(curr->lock));
                     return 0;
                 } else {
                     free(curr->value->data);
                     free(curr->value);
+                    cout<<"\033[1;31m Lock Released"<<endl;
                     pthread_rwlock_unlock(&(curr->lock));
                     curr->value = NULL;
                     return 1;
@@ -622,6 +635,7 @@ class Trie {
     bool del_N(int n) {
         Slice a, b;
         get_val_N(n, a, b);
+        cout<<"\tdeleting value"<<endl;
         del(a);
     }
 
