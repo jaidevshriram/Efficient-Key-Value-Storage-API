@@ -5,71 +5,109 @@
 #include "kvStore.cpp"
 using namespace std;
 
+const string DESCRIPTION[] = {"GET", "PUT", "DELETE", "GET N", "DELETE N"};
+
+string sliceToStr(Slice &a) {
+    string ret = "";
+
+    for (int i = 0; i < a.size; i++)
+        ret += a.data[i];
+
+    return ret;
+}
+
+void strToSlice(string l, Slice &a) {
+    a.size = l.length();
+    a.data = (char *)malloc(a.size);
+    strncpy(a.data, l.c_str(), a.size);
+}
+
 string random_key(int stringLength) {
-    string key = "";
+    string k = "";
     string letters = "";
+
     for (char i = 'a'; i <= 'z'; i++)
         letters += i;
     for (char i = 'A'; i <= 'Z'; i++)
         letters += i;
-    for (int i = 0; i < stringLength; i++)
-        key = key + letters[rand() % 52];
 
-    return key;
+    for (int i = 0; i < stringLength; i++)
+        k = k + letters[rand() % 52];
+
+    return k;
 }
 
 string random_value(int stringLength) {
-    string value = "";
+    string v = "";
     string letters = "";
-    for (int i = 0; i <= 255; i++)
-        letters += char(i);
+
+    for (int i = 32; i < 127; i++)
+        letters += (char)i;
 
     for (int i = 0; i < stringLength; i++)
-        value = value + letters[rand() % 256];
+        v = v + letters[rand() % letters.size()];
 
-    return value;
+    return v;
 }
 
-long CLOCKS_PER_SECOND = 1000000;
-kvstore kv;
-map<string, string> db;
-int db_size = 0;
-int num = 0;
+const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 100;
+const long CLOCKS_PER_SECOND = 1000000;
+const uint key_size = 64, val_size = 255;
 
+kvStore kv(MAX_KEYS);
+
+map<string, string> db;
+
+long long db_size = 0;
+Slice s_key, s_value;
+uint OPS_COUNTER = 0;
+
+/*
+ * MODIFIED
+ * Commented out this useless function
+ */
 void *myThreadFun(void *vargp) {
     int transactions = 0;
     clock_t start = clock();
     int time = 10;
     clock_t tt = clock();
     while ((float(tt - start) / CLOCKS_PER_SECOND) <= time) {
-        // for(int i=0;i<10000;i++)
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10000; i++) {
             transactions += 1;
             int x = rand() % 5;
             if (x == 0) {
-                string k = random_key(10);
-                bool ans = kv.get(k);
+                string key = random_key(rand() % key_size + 1);
+                Slice s_key, s_value;
+                strToSlice(key, s_key);
+                bool ans = kv.get(s_key, s_value);
             } else if (x == 1) {
-                int k = rand() % 64 + 1;
-                int v = rand() % 256 + 1;
-                string key = random_key(k);
-                string value = random_value(v);
-                bool ans = kv.put(key, value);
-                db_size++;
+                string key = random_key(rand() % key_size + 1);
+                string value = random_value(rand() % 255 + 1);
+                Slice s_key, s_value, temp;
+                strToSlice(key, s_key);
+                strToSlice(value, s_value);
+
+                bool check = kv.get(s_key, temp);
+                bool ans = kv.put(s_key, s_value);
+
+                if (check == false)
+                    db_size++;
             } else if (x == 2) {
                 int temp = db_size;
                 if (temp == 0)
                     continue;
                 int rem = rand() % temp;
-                pair<string, string> check = kv.get(rem);
-                bool check2 = kv.del(check.first);
+                Slice s_key, s_value;
+                bool check = kv.get(rem, s_key, s_value);
+                check = kv.del(s_key);
                 db_size--;
             } else if (x == 3) {
                 int temp = db_size;
                 if (temp == 0)
                     continue;
                 int rem = rand() % temp;
-                pair<string, string> check = kv.get(rem);
+                Slice s_key, s_value;
+                bool check = kv.get(rem, s_key, s_value);
             } else if (x == 4) {
                 int temp = db_size;
                 if (temp == 0)
@@ -81,178 +119,200 @@ void *myThreadFun(void *vargp) {
         }
         tt = clock();
     }
+
     cout << transactions / time << endl;
     return NULL;
 }
 
+struct timespec ts;
+long double st, en, total = 0;
+
 int main() {
-    srand(time(0));
     long double total = 0;
-    int n = 10000;
-    for (int i = 0; i < n; i++) {
-        int k = rand() % 64 + 1;
-        int v = rand() % 256 + 1;
-        string key = random_key(k);
-        string value = random_value(v);
-        struct timespec ts;
-        // bool check1 = kv.get(key);
+    srand(time(0));
+
+    for (int i = 0; i < INSERTS; i++) {
+        string key = random_key(rand() % key_size + 1);
+
+        while (db.find(key) != db.end())
+            key = random_key(rand() % key_size + 1);
+
+        string value = random_value(rand() % 255 + 1);
+        db[key] = value;
+        strToSlice(key, s_key);
+        strToSlice(value, s_value);
+
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-        long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
-        bool ans = kv.put(key, value);
+        st = ts.tv_nsec / (1e9) + ts.tv_sec;
+        kv.put(s_key, s_value);
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-        long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
+        en = ts.tv_nsec / (1e9) + ts.tv_sec;
         total += (en - st);
-        printf("%7d\r", i);
+
+        db_size = db.size();
+        printf("\r%8d", i);
     }
-    cout << total << '\n';
-    struct timespec start, end;
-    double time = 0, t;
-    for (int i = 0; i < n; i++) {
-        int k = rand() % 64 + 1;
-        int v = rand() % 256 + 1;
-        string key = random_key(k);
-        string value = random_value(v);
-        struct timespec ts;
-        // bool check1 = kv.get(key);
-        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-        long double st = ts.tv_nsec / (1e9) + ts.tv_sec;
-        // bool check1 = kv.get(key);
-        bool ans = kv.put(key, value);
-        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-        long double en = ts.tv_nsec / (1e9) + ts.tv_sec;
-        time += (en - st);
-        printf("%7d\r", i);
-    }
-    printf("\n%lf\n", time);
-    return 0;
+
+    printf("\rInsertion of %u values took %Lfs\n", INSERTS, total);
+
+    total = 0;
+
     bool incorrect = false;
 
-    time = 0;
-
-    for (int i = 0; i < 10000; i++) {
-        int x = rand() % 2;
-
-        // printf("%7d\r", i);
-
-        // GET Key
+    for (int i = 0; i < NUM_OPS; i++, OPS_COUNTER++) {
+        int x = rand() % 5;
         if (x == 0) {
-            string k = random_key(10);
-            cout << "GET " << k << endl;
-            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-            bool ans = kv.get(k);
-            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-            t = (end.tv_sec - start.tv_sec) +
-                (end.tv_nsec - start.tv_nsec) / 1e9;
-            time += t;
-            map<string, string>::iterator itr = db.find(k);
-            if ((ans == false && itr != db.end()) ||
-                (ans == true && itr == db.end())) {
-                cout << "GET KEY: INCORRECT\n";
-                incorrect = true;
-            }
-        }
+            // DESCRIPTION: GET
+            string key = random_key(rand() % key_size + 1);
+            // string key = random_key(key_size);
+            strToSlice(key, s_key);
 
-        // PUT key
-        else if (x == 1) {
-            int k = rand() % 64 + 1;
-            int v = rand() % 256 + 2;
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            st = ts.tv_nsec / (1e9) + ts.tv_sec;
+            bool ans = kv.get(s_key, s_value);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            en = ts.tv_nsec / (1e9) + ts.tv_sec;
+            total += (en - st);
+
+            map<string, string>::iterator itr = db.find(key);
+            if ((ans == false && itr != db.end()) ||
+                (ans == true && itr->second != sliceToStr(s_value))) {
+                incorrect = true;
+                cout << "\nIncorrect GET for key " << key << "\nFound in kv? "
+                     << ans << "\nFound in db? " << (itr != db.end())
+                     << "\nValues equal? "
+                     << (itr->second == sliceToStr(s_value)) << endl;
+                cout << "Value in kv is " << sliceToStr(s_value)
+                     << " and in db is " << itr->second << endl;
+                cout << "Size of val in db is " << itr->second.size() << endl;
+            }
+        } else if (x == 1) {
+            // DESCRIPTION: PUT
+            int k = rand() % key_size + 1;
+            int v = rand() % 255 + 1;
             string key = random_key(k);
             string value = random_value(v);
-            cout << "PUT " << key << endl;
-            db.insert(pair<string, string>(key, value));
-            bool check1 = kv.get(key);
-            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-            bool ans = kv.put(key, value);
-            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-            t = (end.tv_sec - start.tv_sec) +
-                (end.tv_nsec - start.tv_nsec) / 1e9;
-            time += t;
-            bool check2 = kv.get(key);
-            db_size++;
-            if (check2 == false || check1 != ans) {
-                cout << check2 << '\n';
-                cout << check1 << " " << ans << '\n';
-                cout << "PUT INCORRECT\n";
-                incorrect = true;
-            }
-        }
-        // DELETE
-        else if (x == 2) {
-            int max_size = db.size();
-            int rem = rand() % max_size;
-            map<string, string>::iterator itr = db.begin();
-            for (int i = 0; i < rem; i++)
-                itr++;
-            // cout << itr->first << " " << itr->second << endl;
-            string key = itr->first;
-            bool ans = kv.get(key);
-            // cout << "DEL_GET " << key << endl;
-            map<string, string>::iterator itr2 = db.begin();
-            if ((ans == false && itr2 != db.end()) ||
-                (ans == true && itr2 == db.end())) {
-                cout << "GET KEY: INCORRECT\n";
-                incorrect = true;
-            }
+            db[key] = value;
+            // printf("PUT OP: %s with val %s\n", key, value);
+            strToSlice(key, s_key);
+            strToSlice(value, s_value);
 
-            // cout << "DELETE " << key << endl;
-            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-            bool check = kv.del(key);
-            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-            t = (end.tv_sec - start.tv_sec) +
-                (end.tv_nsec - start.tv_nsec) / 1e9;
-            time += t;
-            db_size--;
-            db.erase(itr);
-            bool check2 = kv.get(key);
-            if (check2 == true) {
-                cout << "DELETE INCORRECT\n";
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            st = ts.tv_nsec / (1e9) + ts.tv_sec;
+            bool ans = kv.put(s_key, s_value);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            en = ts.tv_nsec / (1e9) + ts.tv_sec;
+            total += (en - st);
+
+            Slice check;
+            bool check2 = kv.get(s_key, check);
+            db_size = db.size();
+
+            if (check2 == false || value != sliceToStr(check)) {
                 incorrect = true;
+                cout << "\nSome error with put, will check later" << endl;
             }
-        }
-        // Get nth Key
-        else if (x == 3) {
-            int max_size = db.size();
-            int rem = rand() % max_size;
-            pair<string, string> check = kv.get(rem);
+        } else if (x == 2) {
+            // DESCRIPTION: DELETE
+            int rem = rand() % db.size();
+            map<string, string>::iterator itr = db.begin();
+            advance(itr, rem);
+            string key = itr->first;
+            strToSlice(key, s_key);
+
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            st = ts.tv_nsec / (1e9) + ts.tv_sec;
+            bool check = kv.del(s_key);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            // printf("DEL OP\n");
+            en = ts.tv_nsec / (1e9) + ts.tv_sec;
+            total += (en - st);
+
+            db.erase(itr);
+            db_size--;
+
+            bool check2 = kv.get(s_key, s_value);
+            if (check2 == true) {
+                incorrect = true;
+                cout << "\nExpected to not find key " << key
+                     << " in kv, found it" << endl;
+            }
+        } else if (x == 3) {
+            // DESCRIPTION: GET N
+            int rem = rand() % db_size;
+
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            st = ts.tv_nsec / (1e9) + ts.tv_sec;
+            bool check = kv.get(rem, s_key, s_value);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            en = ts.tv_nsec / (1e9) + ts.tv_sec;
+            total += (en - st);
+
             map<string, string>::iterator itr = db.begin();
             for (int i = 0; i < rem; i++)
                 itr++;
-            if (check.first != itr->first || check.second != itr->second)
+
+            if (itr->first != sliceToStr(s_key) ||
+                itr->second != sliceToStr(s_value)) {
                 incorrect = true;
+                cout << "\nN: " << rem << '\n';
+                cout << "get(n)\nkeys same? "
+                     << (itr->first == sliceToStr(s_key)) << "\nvalues same? "
+                     << (itr->second == sliceToStr(s_value)) << endl;
+                cout << "Key: Supposed to be " << itr->first << "\n Found "
+                     << sliceToStr(s_key) << '\n';
+            }
         } else if (x == 4) {
-            int max_size = db.size();
-            int rem = rand() % max_size;
+            // DESCRIPTION: DELETE N
+            int rem = rand() % db_size;
             map<string, string>::iterator itr = db.begin();
             for (int i = 0; i < rem; i++)
                 itr++;
             string key = itr->first;
+
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            st = ts.tv_nsec / (1e9) + ts.tv_sec;
             bool check = kv.del(rem);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+            en = ts.tv_nsec / (1e9) + ts.tv_sec;
+            total += (en - st);
+
             db.erase(itr);
             db_size--;
-            bool check2 = kv.get(key);
-            if (check2 == true)
+            strToSlice(key, s_key);
+            bool check2 = kv.get(s_key, s_value);
+
+            if (check2 == true) {
                 incorrect = true;
+                cout << "\nSupposed to delete key " << key;
+                cout << "\nFound nth key " << key << " after deleting\n";
+            }
         }
+
+        //  printf("\r%8d", i);
+        printf("\n%8d %10s::%Lfs", i, DESCRIPTION[x].c_str(), total);
 
         if (incorrect == true) {
-            cout << "NOT cool!\n";
+            cout << "\rError in operation " << DESCRIPTION[x] << "\n Completed "
+                 << OPS_COUNTER << " operations\n";
             return 0;
         }
     }
 
-    printf("\n%lf\n", time);
+    cout << "\r" << NUM_OPS << " operations finished in " << total << "s\n";
 
     /*
-        int threads = 4;
+     * MODIFIED
+     * Commented out till the end
+     */
+    int threads = 4;
 
-        pthread_t tid[threads];
-        for (int i = 0; i < threads; i++)
-        {
-                tid[i] = i;
+    pthread_t tid[threads];
+    for (int i = 0; i < threads; i++) {
+        tid[i] = i;
         pthread_create(&tid[i], NULL, myThreadFun, (void *)&tid[i]);
-        }
-        for(int i=0;i<threads;i++)
-                pthread_join(tid[i],NULL);
-    */
+    }
+    for (int i = 0; i < threads; i++)
+        pthread_join(tid[i], NULL);
     return 0;
 }

@@ -1,37 +1,75 @@
 #include <bits/stdc++.h>
-#include "../src/trie.cpp"
+#include "trie_comp.cpp"
+#include <pthread.h>
+
 using namespace std;
 
-class kvstore {
+class kvStore {
+    uint64_t maxSize;
+    pthread_rwlock_t lock;
+
+
    public:
+    kvStore(uint64_t maxSize) {
+        this->maxSize = maxSize;
+        pthread_rwlock_init(&lock, NULL);
+    }
+
     Trie db;
 
-    bool get(string key) {
-        Slice a(key), b;
-        bool is_valid = db.get_val(a, b);
-        return is_valid;
+    bool get(Slice &key, Slice &value) {
+        pthread_rwlock_rdlock(&lock);
+        bool ret = db.get_val(key, value);
+        pthread_rwlock_unlock(&lock);
+
+        return ret;
     }
 
-    bool put(string key, string value) {
-        Slice a(key), b(value);
-        return db.insert(a, b);
-        // return true;
+    bool put(Slice &key, Slice &value) {
+        pthread_rwlock_wrlock(&lock);
+        bool ret = db.insert(key, value);
+        pthread_rwlock_unlock(&lock);
+
+        return ret;
     }
 
-    bool del(string key) {
-        Slice a(key);
-        bool is_valid = true;  // db.del(a);
-        return is_valid;
+    bool del(Slice &key) {
+        Slice value;
+
+        pthread_rwlock_rdlock(&lock);
+        bool exists = db.get_val(key, value);
+        pthread_rwlock_unlock(&lock);
+
+        if(!exists) return false;
+
+        pthread_rwlock_wrlock(&lock);
+        bool ret = db.del(key);
+        pthread_rwlock_unlock(&lock);
+
+        return ret;
     }
 
-    pair<string, string> get(int N) {
-        // Your Code Here
-        pair<string, string> temp = make_pair("key", "value");
-        return temp;
+    bool get(int N, Slice &key, Slice &value) {
+        pthread_rwlock_rdlock(&lock);
+        db.get_val_N(N, key, value);
+        pthread_rwlock_unlock(&lock);
+
+        return true;
     }
 
     bool del(int N) {
-        // Your Code Here
-        return true;
+        Slice key, value;
+
+        pthread_rwlock_rdlock(&lock);
+        bool exists = db.get_val_N(N, key, value);
+        pthread_rwlock_unlock(&lock);
+
+        if(!exists) return false;
+
+        pthread_rwlock_wrlock(&lock);
+        bool ret = db.del(key);
+        pthread_rwlock_unlock(&lock);
+
+        return ret;
     }
 };
