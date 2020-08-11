@@ -7,7 +7,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define TRIE_LIST_SIZE 3500000
 #define TRIE_ARRAY_SIZE 52
+
+#define SLICE_LIST_SIZE 6000000
 
 struct Slice {
     uint8_t size;
@@ -25,7 +28,7 @@ struct Slice {
 
 struct TrieNode {
     char letter;
-    void *arr[52] = {NULL};
+    void *arr[TRIE_ARRAY_SIZE] = {NULL};
     Slice *value;
     int children;
     Slice *word_span;
@@ -39,9 +42,6 @@ class Trie {
     Slice *freeSliceList;
     int missedFreeTrieNode;
     int missedFreeSlice;
-    const int TRIE_LIST_SIZE  = 350000 / NTRIES;
-    const int SLICE_LIST_SIZE = 600000 / NTRIES;
-
 
     TrieNode *getTrieNode() {
         TrieNode *temp;
@@ -61,8 +61,6 @@ class Trie {
 
         for (register int i = 0; i < TRIE_ARRAY_SIZE; i++)
             temp->arr[i] = NULL;
-
-        // temp->arr = {0};
 
         return temp;
     }
@@ -137,9 +135,6 @@ class Trie {
     }
 
     ~Trie() {
-        printf("Missed Trie Allocations: %d\n", missedFreeTrieNode);
-        printf("Missed Slice Allocations: %d\n", missedFreeSlice);
-
         // for(TrieNode *block = freeTrieList; block!=NULL; ) {
         //     TrieNode *temp = block;
         //     block = (TrieNode *) block->value;
@@ -191,10 +186,7 @@ class Trie {
             } else if (len == key.size) {
                 return 1;
             }
-            // len++;
         }
-        // return 0;
-        // cur.arr['a'] = &cur;
     }
 
     bool insert(Slice &key, Slice &value) {
@@ -318,7 +310,7 @@ class Trie {
                         y->children = curr->children;
                         y->letter = pp->data[iter];
                         y->word_span = curr->word_span;
-                        for (int i = 0; i < 52; i += 4) {
+                        for (int i = 0; i < TRIE_ARRAY_SIZE; i += 4) {
                             y->arr[i] = curr->arr[i];
                             y->arr[i + 1] = curr->arr[i + 1];
                             y->arr[i + 2] = curr->arr[i + 2];
@@ -358,7 +350,7 @@ class Trie {
             }
             // len++;
         }
-        cout << "UNREACHABLE 1\n";
+        cout << "UNREACHABLE\n";
         return 0;
         // cur.arr['a'] = &cur;
     }
@@ -401,7 +393,7 @@ class Trie {
             }
         }
 
-        cout << "UNREACHABLE 2\n";
+        cout << "UNREACHABLE\n";
         return 0;
     }
 
@@ -458,15 +450,12 @@ class Trie {
             }
         }
 
-        cout << "UNREACHABLE 3\n";
+        cout << "UNREACHABLE\n";
         return 0;
     }
 
     bool get_val_N(int n, Slice &key, Slice &value) {
         n++;
-        if(n > root->children) {
-            return 0;
-        }
         string s;
         int len = 0;
         register TrieNode *curr = root;
@@ -562,205 +551,205 @@ class Trie {
     }
 };
 
-// int main(void) {
-//     Trie t;
-//     srand(time(NULL));
-//     Slice val("ragsga");
-//     Slice val2("rarara");
-//     // {
-//     //     Slice a("n");
-//     //     Slice b("na");
-//     //     Slice c("nan");
-//     //     Slice d("nna");
-//     //     Slice e("nanna");
-//     //     t.insert(a, val);
-//     //     t.insert(b, val);
-//     //     t.insert(c, val);
-//     //     t.insert(d, val);
-//     //     t.insert(e, val);
+int main(void) {
+    Trie t;
+    srand(time(NULL));
+    Slice val("ragsga");
+    Slice val2("rarara");
+    // {
+    //     Slice a("n");
+    //     Slice b("na");
+    //     Slice c("nan");
+    //     Slice d("nna");
+    //     Slice e("nanna");
+    //     t.insert(a, val);
+    //     t.insert(b, val);
+    //     t.insert(c, val);
+    //     t.insert(d, val);
+    //     t.insert(e, val);
 
-//     //     t.view_all(0, t.root);
-//     //     Slice vala("");
-//     //     cout << t.get_val(a, vala) << '\n';
-//     //     printf("%.*s\n", vala.size, vala.data);
-//     //     Slice valb("");
-//     //     cout << t.get_val(b, valb) << '\n';
-//     //     // cout << valb.data << '\n';
-//     //     Slice valc("");
-//     //     cout << t.get_val(c, valc) << '\n';
-//     //     // cout << valc.data << '\n';
-//     //     Slice val4("");
-//     //     cout << t.get_val(vala, valb) << '\n';
-//     //     cout << t.get_val(val4, valb) << '\n';
-//     // }
-//     // {
-//     //     Slice a("abcd");
-//     //     Slice b("abce");
-//     //     Slice c("abc");
-//     //     t.insert(a, val);
-//     //     t.view_all(0, t.root);
-//     //     t.insert(b, val);
-//     //     t.view_all(0, t.root);
-//     //     t.insert(c, val);
-//     //     t.view_all(0, t.root);
-//     // }
-//     // {
-//     //     Slice a("abcd");
-//     //     Slice b("abd");
-//     //     Slice c("ab");
-//     //     t.insert(a, val);
-//     //     t.insert(b, val);
-//     //     t.insert(c, val);
-//     //     t.view_all(0, t.root);
-//     // }
-//     // {
-//     //     Slice a("a");
-//     //     Slice b("a");
-//     //     Slice c("c");
-//     //     Slice d("bb");
-//     //     Slice e("bc");
-//     //     t.insert(a, val);
-//     //     t.insert(b, val);
-//     //     t.insert(c, val);
-//     //     t.insert(d, val);
-//     //     t.insert(e, val);
-//     //     t.view_all(0, t.root);
-//     //     cout << t.get_val_N(0, a, val) << '\n';
-//     //     cout << a.data << '\n';
-//     //     cout << val.data << '\n';
-//     //     cout << t.get_val_N(1, a, val) << '\n';
-//     //     cout << a.data << '\n';
-//     //     cout << val.data << '\n';
-//     //     cout << t.get_val_N(2, a, val) << '\n';
-//     //     cout << a.data << '\n';
-//     //     cout << val.data << '\n';
-//     //     cout << t.get_val_N(3, a, val) << '\n';
-//     //     cout << a.data << '\n';
-//     //     cout << val.data << '\n';
-//     //     // cout << t.get_val_N(4, a, val) << '\n';
-//     //     // cout << a.data << '\n';
-//     //     // cout << val.data << '\n';
-//     // }
-//     {
-//         Slice ddd;
-//         ddd = Slice("wL");
-//         t.insert(ddd, val);
-//         ddd = Slice("u");
-//         t.insert(ddd, val);
-//         ddd = Slice("lm");
-//         t.insert(ddd, val);
-//         ddd = Slice("Zr");
-//         t.insert(ddd, val);
-//         ddd = Slice("sI");
-//         t.insert(ddd, val);
-//         ddd = Slice("QvD");
-//         t.insert(ddd, val);
-//         ddd = Slice("gV");
-//         t.insert(ddd, val);
-//         ddd = Slice("cXd");
-//         t.insert(ddd, val);
-//         ddd = Slice("k");
-//         t.insert(ddd, val);
-//         ddd = Slice("J");
-//         t.insert(ddd, val);
-//         ddd = Slice("faM");
-//         t.insert(ddd, val);
-//         ddd = Slice("W");
-//         t.insert(ddd, val);
-//         ddd = Slice("z");
-//         t.insert(ddd, val);
-//         ddd = Slice("qxs");
-//         t.insert(ddd, val);
-//         ddd = Slice("IK");
-//         t.insert(ddd, val);
-//         ddd = Slice("Mj");
-//         t.insert(ddd, val);
-//         ddd = Slice("Sok");
-//         t.insert(ddd, val);
-//         ddd = Slice("e");
-//         t.insert(ddd, val);
-//         ddd = Slice("tE");
-//         t.insert(ddd, val);
-//         ddd = Slice("WX");
-//         t.insert(ddd, val);
-//         ddd = Slice("E");
-//         t.insert(ddd, val);
-//         ddd = Slice("xY");
-//         t.insert(ddd, val);
-//         ddd = Slice("QD");
-//         t.insert(ddd, val);
-//         ddd = Slice("IF");
-//         t.insert(ddd, val);
-//         ddd = Slice("Omw");
-//         t.insert(ddd, val);
-//         ddd = Slice("mvv");
-//         t.insert(ddd, val);
-//         ddd = Slice("omF");
-//         t.insert(ddd, val);
-//         ddd = Slice("t");
-//         t.insert(ddd, val);
-//         ddd = Slice("qx");
-//         t.insert(ddd, val);
-//         ddd = Slice("Tae");
-//         t.insert(ddd, val);
-//         ddd = Slice("Oo");
-//         t.insert(ddd, val);
-//         ddd = Slice("H");
-//         t.insert(ddd, val);
-//         ddd = Slice("g");
-//         t.insert(ddd, val);
-//         ddd = Slice("qhw");
-//         t.insert(ddd, val);
-//         ddd = Slice("gDF");
-//         t.insert(ddd, val);
-//         ddd = Slice("QJ");
-//         t.insert(ddd, val);
-//         ddd = Slice("I");
-//         t.insert(ddd, val);
-//         ddd = Slice("D");
-//         t.insert(ddd, val);
-//         cout << t.get_val_N(29, ddd, val) << '\n';
-//         cout << ddd.data << '\n';
-//         t.view_all(0, t.root);
-//     }
-//     // {
-//     //     Slice ddd;
-//     //     ddd = Slice("qxs");
-//     //     t.insert(ddd, val);
-//     //     ddd = Slice("qx");
-//     //     t.insert(ddd, val);
-//     //     // t.view_all(0, t.root);
-//     //     ddd = Slice("qhw");
-//     //     t.insert(ddd, val);
-//     //     t.view_all(0, t.root);
-//     // }
-//     // {
-//     //     Slice ddd;
-//     //     ddd = Slice("wLRbBMqbHcdARZoWkKyhidDQscdxRjMowfRXSJYbQ");
-//     //     t.insert(ddd, val);
-//     //     ddd = Slice("CSgsPqOQMQXNzlGdGwPbtrw");
-//     //     t.insert(ddd, val);
-//     //     ddd =
-//     Slice("yxHOAchwDvmXxRdryxlmNDqtUKwaGMLejUuKWCIbXUBuMEnMEyATD");
-//     //     t.insert(ddd, val);
-//     //     ddd = Slice("UYoyPAyuLyeIMuOTehzriIcFsKPGgKbbI");
-//     //     t.insert(ddd, val);
-//     //     ddd =
-//     Slice("wUzIfwovYDdwYvVbURCZMGYjgFDxvtnunNEsLSplwUIupfXLzbK");
-//     //     t.insert(ddd, val);
-//     //     ddd = Slice("JObMSkSKfojNewXGXnNOFwLTwJwnNvbwjcKDmeoUU");
-//     //     t.insert(ddd, val);
-//     //     ddd = Slice("dZnCqGjlApoPKvXfgVICEtCMKBljOPgtqVVHBGSDVIVheSn");
-//     //     t.insert(ddd, val);
-//     //     cout << t.get_val_N(1, ddd, val) << '\n';
-//     //     cout << ddd.data << '\n';
-//     // }
-//     // for (int i = 0; i < 10000; i++) {
-//     //     Slice s1 = random_key(rand() % 64 + 1);
-//     //     Slice s2 = random_key(rand() % 256 + 1);
-//     //     t.insert(s1, s2);
-//     // }
+    //     t.view_all(0, t.root);
+    //     Slice vala("");
+    //     cout << t.get_val(a, vala) << '\n';
+    //     printf("%.*s\n", vala.size, vala.data);
+    //     Slice valb("");
+    //     cout << t.get_val(b, valb) << '\n';
+    //     // cout << valb.data << '\n';
+    //     Slice valc("");
+    //     cout << t.get_val(c, valc) << '\n';
+    //     // cout << valc.data << '\n';
+    //     Slice val4("");
+    //     cout << t.get_val(vala, valb) << '\n';
+    //     cout << t.get_val(val4, valb) << '\n';
+    // }
+    // {
+    //     Slice a("abcd");
+    //     Slice b("abce");
+    //     Slice c("abc");
+    //     t.insert(a, val);
+    //     t.view_all(0, t.root);
+    //     t.insert(b, val);
+    //     t.view_all(0, t.root);
+    //     t.insert(c, val);
+    //     t.view_all(0, t.root);
+    // }
+    // {
+    //     Slice a("abcd");
+    //     Slice b("abd");
+    //     Slice c("ab");
+    //     t.insert(a, val);
+    //     t.insert(b, val);
+    //     t.insert(c, val);
+    //     t.view_all(0, t.root);
+    // }
+    // {
+    //     Slice a("a");
+    //     Slice b("a");
+    //     Slice c("c");
+    //     Slice d("bb");
+    //     Slice e("bc");
+    //     t.insert(a, val);
+    //     t.insert(b, val);
+    //     t.insert(c, val);
+    //     t.insert(d, val);
+    //     t.insert(e, val);
+    //     t.view_all(0, t.root);
+    //     cout << t.get_val_N(0, a, val) << '\n';
+    //     cout << a.data << '\n';
+    //     cout << val.data << '\n';
+    //     cout << t.get_val_N(1, a, val) << '\n';
+    //     cout << a.data << '\n';
+    //     cout << val.data << '\n';
+    //     cout << t.get_val_N(2, a, val) << '\n';
+    //     cout << a.data << '\n';
+    //     cout << val.data << '\n';
+    //     cout << t.get_val_N(3, a, val) << '\n';
+    //     cout << a.data << '\n';
+    //     cout << val.data << '\n';
+    //     // cout << t.get_val_N(4, a, val) << '\n';
+    //     // cout << a.data << '\n';
+    //     // cout << val.data << '\n';
+    // }
+    {
+        Slice ddd;
+        ddd = Slice("wL");
+        t.insert(ddd, val);
+        ddd = Slice("u");
+        t.insert(ddd, val);
+        ddd = Slice("lm");
+        t.insert(ddd, val);
+        ddd = Slice("Zr");
+        t.insert(ddd, val);
+        ddd = Slice("sI");
+        t.insert(ddd, val);
+        ddd = Slice("QvD");
+        t.insert(ddd, val);
+        ddd = Slice("gV");
+        t.insert(ddd, val);
+        ddd = Slice("cXd");
+        t.insert(ddd, val);
+        ddd = Slice("k");
+        t.insert(ddd, val);
+        ddd = Slice("J");
+        t.insert(ddd, val);
+        ddd = Slice("faM");
+        t.insert(ddd, val);
+        ddd = Slice("W");
+        t.insert(ddd, val);
+        ddd = Slice("z");
+        t.insert(ddd, val);
+        ddd = Slice("qxs");
+        t.insert(ddd, val);
+        ddd = Slice("IK");
+        t.insert(ddd, val);
+        ddd = Slice("Mj");
+        t.insert(ddd, val);
+        ddd = Slice("Sok");
+        t.insert(ddd, val);
+        ddd = Slice("e");
+        t.insert(ddd, val);
+        ddd = Slice("tE");
+        t.insert(ddd, val);
+        ddd = Slice("WX");
+        t.insert(ddd, val);
+        ddd = Slice("E");
+        t.insert(ddd, val);
+        ddd = Slice("xY");
+        t.insert(ddd, val);
+        ddd = Slice("QD");
+        t.insert(ddd, val);
+        ddd = Slice("IF");
+        t.insert(ddd, val);
+        ddd = Slice("Omw");
+        t.insert(ddd, val);
+        ddd = Slice("mvv");
+        t.insert(ddd, val);
+        ddd = Slice("omF");
+        t.insert(ddd, val);
+        ddd = Slice("t");
+        t.insert(ddd, val);
+        ddd = Slice("qx");
+        t.insert(ddd, val);
+        ddd = Slice("Tae");
+        t.insert(ddd, val);
+        ddd = Slice("Oo");
+        t.insert(ddd, val);
+        ddd = Slice("H");
+        t.insert(ddd, val);
+        ddd = Slice("g");
+        t.insert(ddd, val);
+        ddd = Slice("qhw");
+        t.insert(ddd, val);
+        ddd = Slice("gDF");
+        t.insert(ddd, val);
+        ddd = Slice("QJ");
+        t.insert(ddd, val);
+        ddd = Slice("I");
+        t.insert(ddd, val);
+        ddd = Slice("D");
+        t.insert(ddd, val);
+        cout << t.get_val_N(29, ddd, val) << '\n';
+        cout << ddd.data << '\n';
+        t.view_all(0, t.root);
+    }
+    // {
+    //     Slice ddd;
+    //     ddd = Slice("qxs");
+    //     t.insert(ddd, val);
+    //     ddd = Slice("qx");
+    //     t.insert(ddd, val);
+    //     // t.view_all(0, t.root);
+    //     ddd = Slice("qhw");
+    //     t.insert(ddd, val);
+    //     t.view_all(0, t.root);
+    // }
+    // {
+    //     Slice ddd;
+    //     ddd = Slice("wLRbBMqbHcdARZoWkKyhidDQscdxRjMowfRXSJYbQ");
+    //     t.insert(ddd, val);
+    //     ddd = Slice("CSgsPqOQMQXNzlGdGwPbtrw");
+    //     t.insert(ddd, val);
+    //     ddd =
+    Slice("yxHOAchwDvmXxRdryxlmNDqtUKwaGMLejUuKWCIbXUBuMEnMEyATD");
+    //     t.insert(ddd, val);
+    //     ddd = Slice("UYoyPAyuLyeIMuOTehzriIcFsKPGgKbbI");
+    //     t.insert(ddd, val);
+    //     ddd =
+    Slice("wUzIfwovYDdwYvVbURCZMGYjgFDxvtnunNEsLSplwUIupfXLzbK");
+    //     t.insert(ddd, val);
+    //     ddd = Slice("JObMSkSKfojNewXGXnNOFwLTwJwnNvbwjcKDmeoUU");
+    //     t.insert(ddd, val);
+    //     ddd = Slice("dZnCqGjlApoPKvXfgVICEtCMKBljOPgtqVVHBGSDVIVheSn");
+    //     t.insert(ddd, val);
+    //     cout << t.get_val_N(1, ddd, val) << '\n';
+    //     cout << ddd.data << '\n';
+    // }
+    // for (int i = 0; i < 10000; i++) {
+    //     Slice s1 = random_key(rand() % 64 + 1);
+    //     Slice s2 = random_key(rand() % 256 + 1);
+    //     t.insert(s1, s2);
+    // }
 
-//     // cout << t.count_ptr(t.root) << " " << t.root->children << '\n';
-//     return 0;
-// }
+    // cout << t.count_ptr(t.root) << " " << t.root->children << '\n';
+    return 0;
+}

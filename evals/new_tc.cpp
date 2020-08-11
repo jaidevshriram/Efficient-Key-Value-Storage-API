@@ -7,7 +7,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define TRIE_LIST_SIZE 3500000
 #define TRIE_ARRAY_SIZE 52
+
+#define SLICE_LIST_SIZE 6000000
 
 struct Slice {
     uint8_t size;
@@ -39,9 +42,6 @@ class Trie {
     Slice *freeSliceList;
     int missedFreeTrieNode;
     int missedFreeSlice;
-    const int TRIE_LIST_SIZE  = 350000 / NTRIES;
-    const int SLICE_LIST_SIZE = 600000 / NTRIES;
-
 
     TrieNode *getTrieNode() {
         TrieNode *temp;
@@ -165,7 +165,7 @@ class Trie {
             new_key->data[i] = key.data[i];
         }
         int len = 0;
-        register TrieNode *curr = root;
+        TrieNode *curr = root;
         while (curr != NULL) {
             curr->children--;
             if (len < key.size) {
@@ -358,7 +358,7 @@ class Trie {
             }
             // len++;
         }
-        cout << "UNREACHABLE 1\n";
+        cout << "UNREACHABLE\n";
         return 0;
         // cur.arr['a'] = &cur;
     }
@@ -401,7 +401,7 @@ class Trie {
             }
         }
 
-        cout << "UNREACHABLE 2\n";
+        cout << "UNREACHABLE\n";
         return 0;
     }
 
@@ -419,7 +419,7 @@ class Trie {
                 if (curr->arr[x] == NULL) {
                     return 0;
                 }
-
+                // TODO: Review this please
                 TrieNode *newCurr = (TrieNode *)curr->arr[x];
 
                 if (newCurr->children == 1) {
@@ -458,18 +458,15 @@ class Trie {
             }
         }
 
-        cout << "UNREACHABLE 3\n";
+        cout << "UNREACHABLE\n";
         return 0;
     }
 
     bool get_val_N(int n, Slice &key, Slice &value) {
         n++;
-        if(n > root->children) {
-            return 0;
-        }
         string s;
         int len = 0;
-        register TrieNode *curr = root;
+        TrieNode *curr = root;
         while (curr != NULL) {
             // cout << curr->children << endl;
             if (curr->children < n) {
@@ -524,6 +521,12 @@ class Trie {
         }
         // cur.arr['a'] = &cur;
         // cout << endl;
+    }
+
+    bool del_N(int n) {
+        Slice a, b;
+        get_val_N(n, a, b);
+        del(a);
     }
 
     void view_all(int depth, TrieNode *curr) {
