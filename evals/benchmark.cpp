@@ -50,7 +50,7 @@ string random_value(int stringLength) {
     return v;
 }
 
-const uint MAX_KEYS = 10000000, INSERTS = 100000, NUM_OPS = 100;
+const uint MAX_KEYS = 10000000, INSERTS = 100, NUM_OPS = 0;
 const long CLOCKS_PER_SECOND = 1000000;
 const uint key_size = 64, val_size = 255;
 
@@ -99,8 +99,8 @@ void *myThreadFun(void *vargp) {
                 int rem = rand() % temp;
                 Slice s_key, s_value;
                 bool check = kv.get(rem, s_key, s_value);
-                check = kv.del(s_key);
-                db_size--;
+                if(check) check = kv.del(s_key);
+                if(check) db_size--;
             } else if (x == 3) {
                 int temp = db_size;
                 if (temp == 0)
@@ -114,7 +114,7 @@ void *myThreadFun(void *vargp) {
                     continue;
                 int rem = rand() % temp;
                 bool check = kv.del(rem);
-                db_size--;
+                if(check) db_size--;
             }
         }
         tt = clock();

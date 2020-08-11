@@ -7,10 +7,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define TRIE_LIST_SIZE 3500000
 #define TRIE_ARRAY_SIZE 52
-
-#define SLICE_LIST_SIZE 6000000
 
 struct Slice {
     uint8_t size;
@@ -42,6 +39,9 @@ class Trie {
     Slice *freeSliceList;
     int missedFreeTrieNode;
     int missedFreeSlice;
+    const int TRIE_LIST_SIZE  = 350000 / NTRIES;
+    const int SLICE_LIST_SIZE = 600000 / NTRIES;
+
 
     TrieNode *getTrieNode() {
         TrieNode *temp;
@@ -358,7 +358,7 @@ class Trie {
             }
             // len++;
         }
-        cout << "UNREACHABLE\n";
+        cout << "UNREACHABLE 1\n";
         return 0;
         // cur.arr['a'] = &cur;
     }
@@ -401,7 +401,7 @@ class Trie {
             }
         }
 
-        cout << "UNREACHABLE\n";
+        cout << "UNREACHABLE 2\n";
         return 0;
     }
 
@@ -458,12 +458,15 @@ class Trie {
             }
         }
 
-        cout << "UNREACHABLE\n";
+        cout << "UNREACHABLE 3\n";
         return 0;
     }
 
     bool get_val_N(int n, Slice &key, Slice &value) {
         n++;
+        if(n > root->children) {
+            return 0;
+        }
         string s;
         int len = 0;
         register TrieNode *curr = root;
